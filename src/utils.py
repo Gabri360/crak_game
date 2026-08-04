@@ -60,7 +60,6 @@ def add_row(row, start):
 
 #------------------------------------------------------------------------------------------------------------------------
 
-def check_death(row, pos):
-    if row[pos]:
-        return False
-    return True
+def check_death(game, pos):
+    if not game.row[0][pos]:
+        game.lose = True

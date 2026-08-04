@@ -13,31 +13,64 @@ clock = pygame.time.Clock()
 player = Player()
 game = Game()
 
-while game.quit:
+restart = True
 
-    screen.fill("green")
+while not game.quit:
+    while not game.lose:
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            game.quit = False
+        screen.fill("green")
 
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                player.move(False)
-                game.move_game(player.pos.y)
-            elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                player.move(True)
-                game.move_game(player.pos.y)
-            elif event.key == pygame.K_q:
-                game.quit=False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game.lose = True
+                game.quit = True
+
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_a or event.key == pygame.K_LEFT:
+                    if player.move(False):
+                        game.move_game(player.pos.y)
+                elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+                    if player.move(True):
+                        game.move_game(player.pos.y)
+                elif event.key == pygame.K_q:
+                    game.lose = True
+                    game.quit=True
 
 
-    if check_death(game.row[0],int(player.pos.y)):
-        game.quit = False
-    game.draw_rect(screen)
-    player.draw(screen)
-    pygame.display.flip()
+        check_death(game,int(player.pos.y))
+        game.draw_rect(screen)
+        player.draw(screen)
+        pygame.display.flip()
 
-    # dt is delta time in seconds since last frame, used for independent physics.
-    game.dt = clock.tick(FRAME_RATE) / 1000
+        # dt is delta time in seconds since last frame, used for independent physics.
+        game.dt = clock.tick(FRAME_RATE) / 1000
+
+    if not game.quit:
+        restart = False
+
+    while not restart:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                restart = True
+                game.quit = True
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    player = Player()
+                    game = Game()
+                    restart= True
+                    game.quit = False
+                elif event.key == pygame.K_q:
+                    game.quit = True
+                    restart = True
+
+        game_over_img = pygame.transform.scale(pygame.image.load("frog_spritesheets/pixelart_skull.png"), (SCREEN_WIDTH*3//4,SCREEN_WIDTH*3//4))
+        rect_img = game_over_img.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+        screen.blit(game_over_img,rect_img)
+        game.draw_rect(screen)
+        player.draw(screen)
+        player.draw(screen)
+        pygame.display.flip()
+
+
+
 pygame.quit()

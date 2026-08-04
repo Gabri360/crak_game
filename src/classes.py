@@ -17,13 +17,17 @@ class Player:
         else:
             screen.blit(self.idle_left, grid_to_pixel(self.pos, 0))
     def move(self, is_right):
-        if is_right:
-            new_pos = pygame.Vector2(self.pos.x, min(self.pos.y+1,2))
+        if is_right and self.pos.y != 2:
+            new_pos = self.pos.y+1
             self.is_moving_right = 1
-        else:
-            new_pos = pygame.Vector2(self.pos.x, max(self.pos.y-1,0))
+            self.pos.y = new_pos
+            return True
+        if (not is_right) and self.pos.y != 0:
+            new_pos = self.pos.y-1
             self.is_moving_right = 0
-        self.pos = new_pos
+            self.pos.y = new_pos
+            return True
+        return False
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -36,7 +40,8 @@ class Plat:
 #------------------------------------------------------------------------------------------------------------------------
 class Game:
     def __init__(self):
-        self.quit = 1
+        self.quit = False
+        self.lose = False
         self.dt = 0
         self.row = init_row()
     def draw_rect(self, screen):
