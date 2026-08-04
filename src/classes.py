@@ -1,7 +1,8 @@
 import pygame
 from src.config import *
-from src.utils import grid_to_pixel
+from src.utils import *
 
+#------------------------------------------------------------------------------------------------------------------------
 class Player:
     def __init__(self):
         self.pos = pygame.Vector2(0,1)
@@ -24,6 +25,8 @@ class Player:
             self.is_moving_right = 0
         self.pos = new_pos
 
+#------------------------------------------------------------------------------------------------------------------------
+
 class Plat:
     def __init__(self, x, y):
         self.body = pygame.Rect(grid_to_pixel(pygame.Vector2(x, y),1), (RECT_WIDTH, RECT_HEIGHT))
@@ -33,11 +36,12 @@ class Plat:
         new_pos = pygame.Vector2(x, y)
         self.body.topleft = grid_to_pixel(pygame.Vector2(new_pos),1)
 
+#------------------------------------------------------------------------------------------------------------------------
 class Game:
     def __init__(self):
         self.quit = 1
         self.dt = 0
-        self.row = [[0, 1, 0],[1,0,1],[0,1,1]]
+        self.row = init_row()
     def draw_rect(self, screen):
         for x in range(3):
             for y in range(3):

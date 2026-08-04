@@ -1,8 +1,7 @@
 import pygame
 from src.config import *
-from src.classes import Player, Plat, Game
-from src.utils import grid_to_pixel
-
+from src.classes import *
+from src.utils import *
 
 
 

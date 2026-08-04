@@ -1,6 +1,5 @@
 
 
-
 FRAME_RATE = 60
 
 SCREEN_HEIGHT = 500
