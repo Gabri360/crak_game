@@ -24,12 +24,16 @@ while game.quit:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_a or event.key == pygame.K_LEFT:
                 player.move(False)
-
+                game.move_game(player.pos.y)
             elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
                 player.move(True)
+                game.move_game(player.pos.y)
             elif event.key == pygame.K_q:
                 game.quit=False
 
+
+    if check_death(game.row[0],int(player.pos.y)):
+        game.quit = False
     game.draw_rect(screen)
     player.draw(screen)
     pygame.display.flip()

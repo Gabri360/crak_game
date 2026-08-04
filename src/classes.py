@@ -45,3 +45,5 @@ class Game:
                 if self.row[x][y]:
                     rect=Plat(x,y)
                     rect.draw(screen)
+    def move_game(self, start):
+        add_row(self.row,start)

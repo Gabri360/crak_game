@@ -14,7 +14,7 @@ def grid_to_pixel(pos_grid, is_rect):
     return pos_pixel
 #------------------------------------------------------------------------------------------------------------------------
 
-def row_valid(row, start):
+def row_init_valid(row, start):
     if (start == 0 or start == 2) and row[1][1]:
         if row[2][0] or row[2][2]:
             return True
@@ -23,6 +23,13 @@ def row_valid(row, start):
             return True
     return False
 
+def row_valid(row, start):
+    if(start == 0 or start == 2):
+        if(row[0] or row[2]):
+            return True
+    if start == 1 and row[1]:
+        return True
+    return False
 
 def init_row():
     while True:
@@ -30,11 +37,30 @@ def init_row():
         for i in range(2):
             temp_row=[0,0,0]
             for j in range(3):
-                rand = random.randint(0, 3)
+                rand = random.randint(0, RAND_VALUE)
                 if rand == 0:
                     temp_row[j] = 1
             row.append(temp_row)
-        if row_valid(row, 1):
+        if row_init_valid(row, 1):
             break
     return row
+
+def add_row(row, start):
+    while True:
+        temp_row = [0,0,0]
+        for j in range(3):
+            rand = random.randint(0, RAND_VALUE)
+            if rand == 0:
+                temp_row[j] = 1
+        if row_valid(temp_row,start):
+            break
+    row.pop(0)
+    row.append(temp_row)
+    return row
+
 #------------------------------------------------------------------------------------------------------------------------
+
+def check_death(row, pos):
+    if row[pos]:
+        return False
+    return True
