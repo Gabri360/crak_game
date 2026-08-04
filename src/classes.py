@@ -1,34 +1,7 @@
 import pygame
+from src.config import *
+from src.utils import grid_to_pixel
 
-# VARIABLES
-
-FRAME_RATE = 60
-
-SCREEN_HEIGHT = 500
-SCREEN_WIDHT = 500
-
-RECT_HEIGHT = 15
-RECT_WIDHT = 100
-BORDER_RADIUS = 5
-
-# PYGAME SETUP
-pygame.init()
-screen = pygame.display.set_mode((SCREEN_HEIGHT, SCREEN_WIDHT), pygame.RESIZABLE)
-clock = pygame.time.Clock()
-
-#FUNCTION
-
-def grid_to_pixel(pos_grid, is_rect):
-    cell_width = SCREEN_WIDHT // 3
-    cell_height = SCREEN_HEIGHT // 3
-    if is_rect:
-        pos_pixel = pygame.Vector2((pos_grid.y * cell_width + cell_width // 2) - RECT_WIDHT/2, (SCREEN_HEIGHT - (pos_grid.x * cell_height + cell_height // 2)) - RECT_HEIGHT/2)
-    else:
-        pos_pixel = pygame.Vector2(pos_grid.y * cell_height + cell_height // 2 - 48, SCREEN_HEIGHT - (pos_grid.x * cell_width + cell_width // 2 + 100))
-
-    return pos_pixel
-
-# CLASSES
 class Player:
     def __init__(self):
         self.pos = pygame.Vector2(0,1)
@@ -53,7 +26,7 @@ class Player:
 
 class Plat:
     def __init__(self, x, y):
-        self.body = pygame.Rect(grid_to_pixel(pygame.Vector2(x, y),1), (RECT_WIDHT, RECT_HEIGHT))
+        self.body = pygame.Rect(grid_to_pixel(pygame.Vector2(x, y),1), (RECT_WIDTH, RECT_HEIGHT))
     def draw(self,screen):
         pygame.draw.rect(screen, "orange", self.body, border_radius=BORDER_RADIUS)
     def move(self, x, y):
@@ -71,34 +44,3 @@ class Game:
                 if self.row[x][y]:
                     rect=Plat(x,y)
                     rect.draw(screen)
-
-
-
-
-player = Player()
-game = Game()
-
-while game.quit:
-
-    screen.fill("green")
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            game.quit = False
-
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                player.move(False)
-
-            elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                player.move(True)
-            elif event.key == pygame.K_q:
-                game.quit=False
-
-    game.draw_rect(screen)
-    player.draw(screen)
-    pygame.display.flip()
-
-    # dt is delta time in seconds since last frame, used for independent physics.
-    game.dt = clock.tick(FRAME_RATE) / 1000
-pygame.quit()

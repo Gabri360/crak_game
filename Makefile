@@ -1,6 +1,9 @@
 
 
-all: crak
+all: main
 
-crak:
-	python src/crak.py
+main:
+	python main.py
+
+clean:
+	find . -name "__pycache__" -type d -exec rm -r {} +
