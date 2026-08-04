@@ -32,9 +32,6 @@ class Plat:
         self.body = pygame.Rect(grid_to_pixel(pygame.Vector2(x, y),1), (RECT_WIDTH, RECT_HEIGHT))
     def draw(self,screen):
         pygame.draw.rect(screen, "orange", self.body, border_radius=BORDER_RADIUS)
-    def move(self, x, y):
-        new_pos = pygame.Vector2(x, y)
-        self.body.topleft = grid_to_pixel(pygame.Vector2(new_pos),1)
 
 #------------------------------------------------------------------------------------------------------------------------
 class Game:

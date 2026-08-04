@@ -13,13 +13,28 @@ def grid_to_pixel(pos_grid, is_rect):
 
     return pos_pixel
 #------------------------------------------------------------------------------------------------------------------------
+
+def row_valid(row, start):
+    if (start == 0 or start == 2) and row[1][1]:
+        if row[2][0] or row[2][2]:
+            return True
+    if start == 1:
+        if (row[1][0] or row[1][2]) and row[2][1]:
+            return True
+    return False
+
+
 def init_row():
-    row = [[0,1,0]]
-    for i in range(2):
-        temp_row=[0,0,0]
-        for j in range(3):
-            rand = random.randint(0, 1)
-            if rand == 0:
-                temp_row[j] = 1
-        row.append(temp_row)
+    while True:
+        row = [[0,1,0]]
+        for i in range(2):
+            temp_row=[0,0,0]
+            for j in range(3):
+                rand = random.randint(0, 3)
+                if rand == 0:
+                    temp_row[j] = 1
+            row.append(temp_row)
+        if row_valid(row, 1):
+            break
     return row
+#------------------------------------------------------------------------------------------------------------------------
