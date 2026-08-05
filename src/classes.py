@@ -42,6 +42,7 @@ class Game:
     def __init__(self):
         self.quit = False
         self.lose = False
+        self.score = 0
         self.dt = 0
         self.row = init_row()
     def draw_rect(self, screen):
@@ -50,5 +51,15 @@ class Game:
                 if self.row[x][y]:
                     rect=Plat(x,y)
                     rect.draw(screen)
+    def draw_score(self, screen, font):
+        text = font.render(f"  Score: {self.score}  ", True, (255, 255, 255))
+        padding = 7
+        bg_rect = text.get_rect(topleft=(11, 11))
+        bg_rect.inflate_ip(padding * 2, padding * 2)
+        pygame.draw.rect(screen, "orange", bg_rect, border_radius = BORDER_RADIUS)
+
+        screen.blit(text, (bg_rect.x + padding, bg_rect.y + padding))
+
     def move_game(self, start):
         add_row(self.row,start)
+        self.score += 1

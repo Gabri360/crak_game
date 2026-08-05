@@ -8,12 +8,14 @@ from src.utils import *
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_HEIGHT, SCREEN_WIDTH), pygame.RESIZABLE)
 clock = pygame.time.Clock()
-
+font = pygame.font.Font(None, 36)
 
 player = Player()
 game = Game()
 
 restart = True
+
+#------------------------------------------------------------------------------------------------------------------------
 
 while not game.quit:
     while not game.lose:
@@ -40,10 +42,14 @@ while not game.quit:
         check_death(game,int(player.pos.y))
         game.draw_rect(screen)
         player.draw(screen)
-        pygame.display.flip()
 
+        game.draw_score(screen, font)
+
+
+        pygame.display.flip()
         # dt is delta time in seconds since last frame, used for independent physics.
         game.dt = clock.tick(FRAME_RATE) / 1000
+#------------------------------------------------------------------------------------------------------------------------
 
     if not game.quit:
         restart = False
@@ -70,6 +76,7 @@ while not game.quit:
         player.draw(screen)
         player.draw(screen)
         pygame.display.flip()
+#------------------------------------------------------------------------------------------------------------------------
 
 
 
