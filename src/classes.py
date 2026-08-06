@@ -46,6 +46,12 @@ class Plat:
     def draw(self,screen):
         pygame.draw.rect(screen, "orange", self.body, border_radius=BORDER_RADIUS)
 
+class Cloud:
+    def __init__(self):
+        self.body = [pygame.image.load("frog_spritesheets/Cloud-2.png"),  pygame.image.load("frog_spritesheets/Cloud-31.png")]
+        self.pos_y = [SCREEN_HEIGHT//6, SCREEN_HEIGHT*2//3]
+        self.pos_x = [SCREEN_WIDTH//3 -58, SCREEN_WIDTH*2//3 -94]
+
 #------------------------------------------------------------------------------------------------------------------------
 class Game:
     def __init__(self):
@@ -57,8 +63,11 @@ class Game:
         self.dt = 0
         self.row = init_row()
         self.old_row = self.row.copy()
+        self.cloud = Cloud()
 
     def draw_rect(self, screen):
+        for i in range(2):
+            screen.blit(self.cloud.body[i], (self.cloud.pos_x[i],self.cloud.pos_y[i]))
         for x in range(3):
             for y in range(3):
                 if self.row[x][y]:
@@ -83,6 +92,12 @@ class Game:
         self.score += 1
 
     def render_animation(self, screen):
+        for i in range(2):
+            if self.cloud.pos_y[i] > SCREEN_HEIGHT:
+                self.cloud.pos_y[i] = -100
+            self.cloud.pos_y[i] += CLOUD_VELOCITY * self.animation_time * ANIMATION_RATE
+            screen.blit(self.cloud.body[i], (self.cloud.pos_x[i],self.cloud.pos_y[i]))
+
         for x in range(4):
             for y in range(3):
                 if self.old_row[x][y]:
