@@ -3,13 +3,11 @@ import random
 from src.config import *
 
 #------------------------------------------------------------------------------------------------------------------------
-def grid_to_pixel(pos_grid, is_rect):
+def grid_to_pixel(pos_grid):
     cell_width = SCREEN_WIDTH // 3
     cell_height = SCREEN_HEIGHT // 3
-    if is_rect:
-        pos_pixel = pygame.Vector2((pos_grid.y * cell_width + cell_width // 2) - RECT_WIDTH/2, (SCREEN_HEIGHT - (pos_grid.x * cell_height + cell_height // 2)) - RECT_HEIGHT/2)
-    else:
-        pos_pixel = pygame.Vector2(pos_grid.y * cell_height + cell_height // 2 - 48, SCREEN_HEIGHT - (pos_grid.x * cell_width + cell_width // 2 + 100))
+
+    pos_pixel = pygame.Vector2((pos_grid.y * cell_width + cell_width // 2) - RECT_WIDTH/2, (SCREEN_HEIGHT - (pos_grid.x * cell_height + cell_height // 2)) - RECT_HEIGHT/2)
 
     return pos_pixel
 #------------------------------------------------------------------------------------------------------------------------
@@ -45,7 +43,7 @@ def init_row():
             break
     return row
 
-def add_row(row, start):
+def add_row(game, start):
     while True:
         temp_row = [0,0,0]
         for j in range(3):
@@ -54,9 +52,9 @@ def add_row(row, start):
                 temp_row[j] = 1
         if row_valid(temp_row,start):
             break
-    row.pop(0)
-    row.append(temp_row)
-    return row
+    game.row.pop(0)
+    game.row.append(temp_row)
+    game.old_row.append(temp_row)
 
 #------------------------------------------------------------------------------------------------------------------------
 

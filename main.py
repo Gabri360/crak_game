@@ -30,18 +30,26 @@ while not game.quit:
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_a or event.key == pygame.K_LEFT:
                     if player.move(False):
-                        game.move_game(player.pos.y)
+                        game.move_game(player.pos)
                 elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
                     if player.move(True):
-                        game.move_game(player.pos.y)
+                        game.move_game(player.pos)
                 elif event.key == pygame.K_q:
                     game.lose = True
                     game.quit=True
 
 
-        check_death(game,int(player.pos.y))
-        game.draw_rect(screen)
-        player.draw(screen)
+        check_death(game,int(player.pos))
+        if game.is_animated:
+            game.render_animation(screen)
+            player.render_animation(screen, game)
+            if game.animation_time >= 1/ANIMATION_RATE:
+                game.is_animated = False
+                game.old_row.pop(0)
+                game.animation_time = 0
+        else:
+            game.draw_rect(screen)
+            player.draw(screen)
 
         game.draw_score(screen, font)
 
@@ -55,6 +63,7 @@ while not game.quit:
         restart = False
 
     while not restart:
+        screen.fill("green")
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 restart = True
@@ -72,6 +81,7 @@ while not game.quit:
         game_over_img = pygame.transform.scale(pygame.image.load("frog_spritesheets/pixelart_skull.png"), (SCREEN_WIDTH*3//4,SCREEN_WIDTH*3//4))
         rect_img = game_over_img.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
         screen.blit(game_over_img,rect_img)
+        game.draw_score(screen, font)
         game.draw_rect(screen)
         player.draw(screen)
         player.draw(screen)
