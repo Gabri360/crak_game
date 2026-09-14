@@ -7,7 +7,7 @@
 void Renderer_Init(int screenWidth, int screenHeight);
 void Renderer_Shutdown(void);
 
-void DrawRoundedRect(float x, float y, float w, float h, vec4 color, float radius);
+void DrawRoundedRect(float x, float y, float w, float h, vec4 color, float radius, vec4 border_color, float border_widht);
 void DrawRect(float x, float y, float w, float h, vec4 color);
 void DrawSprite(GLuint texture, float x, float y, float w, float h);
 void DrawGradientBackground(vec4 colorTop, vec4 colorBottom, float time);

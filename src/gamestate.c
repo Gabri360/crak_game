@@ -35,6 +35,7 @@ void Game_Update(double dt) {
         state_play_update(dt);
         break;
     case STATE_PAUSED:
+		state_paused_update(dt);
         break;
     case STATE_GAMEOVER:
 		state_gameover_update(dt);
@@ -42,16 +43,16 @@ void Game_Update(double dt) {
     }
 }
 
-void Game_Run(double dt) {
+void Game_Run(void) {
     switch (currentState) {
     case STATE_PLAY:
-        state_play_run(dt);
+        state_play_run();
         break;
     case STATE_PAUSED:
-		state_paused_run(dt);
+		state_paused_run();
         break;
     case STATE_GAMEOVER:
-		state_gameover_run(dt);
+		state_gameover_run();
         break;
     }
 }

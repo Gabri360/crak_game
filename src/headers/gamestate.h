@@ -10,7 +10,7 @@ typedef enum {
 void Game_Init(void);
 void Game_state_enter(void);
 void Game_Update(double dt);
-void Game_Run(double dt);
+void Game_Run(void);
 void Game_handle_events(GLFWwindow* window);
 void Game_Shutdown(void);
 void Game_state_esc(void);

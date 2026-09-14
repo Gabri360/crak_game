@@ -25,9 +25,9 @@ void state_gameover_update(double dt) {
 	dt=dt;
 }
 
-void state_gameover_run(double dt) {
+void state_gameover_run(void) {
 
-	dt=dt;
+	state_play_run();
 
 	DrawSprite(skull, 0, 0, WIN_W, WIN_H);
 }

@@ -9,7 +9,7 @@
 static GLuint quadVAO, quadVBO;
 
 static GLuint roundedShaderProgram;
-static GLint locRRModel, locRRProj, locRRColor, locRRSize, locRRRadius;
+static GLint locRRModel, locRRProj, locRRColor, locRRSize, locRRRadius, locRRBorderColor, locRRBorderWidht;
 
 static GLuint shaderProgram;
 static GLint locModel, locProj, locColor, locUseTexture;
@@ -40,6 +40,8 @@ void Renderer_Init(int screenWidth, int screenHeight) {
     locRRColor  = glGetUniformLocation(roundedShaderProgram, "uColor");
     locRRSize   = glGetUniformLocation(roundedShaderProgram, "uSize");
     locRRRadius = glGetUniformLocation(roundedShaderProgram, "uRadius");
+    locRRBorderColor   = glGetUniformLocation(roundedShaderProgram, "uBorderColor");
+    locRRBorderWidht = glGetUniformLocation(roundedShaderProgram, "uBorderWidth");
 
 
 	backgroundShaderProgram = LoadShaderProgram(vertPath, bgFragPath);
@@ -118,7 +120,7 @@ static void DrawQuad(GLuint texture, float x, float y, float w, float h, vec4 co
 }
 
 
-void DrawRoundedRect(float x, float y, float w, float h, vec4 color, float radius) {
+void DrawRoundedRect(float x, float y, float w, float h, vec4 color, float radius, vec4 border_color, float border_widht) {
 
     float maxRadius = fminf(w, h) * 0.5f;
     if (radius > maxRadius) radius = maxRadius;
@@ -132,8 +134,10 @@ void DrawRoundedRect(float x, float y, float w, float h, vec4 color, float radiu
     glUniformMatrix4fv(locRRModel, 1, GL_FALSE, (float*)model);
     glUniformMatrix4fv(locRRProj, 1, GL_FALSE, (float*)projection);
     glUniform4fv(locRRColor, 1, color);
+	glUniform4fv(locRRBorderColor, 1, border_color);
     glUniform2f(locRRSize, w, h);
     glUniform1f(locRRRadius, radius);
+    glUniform1f(locRRBorderWidht, border_widht);
 
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);

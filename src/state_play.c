@@ -19,6 +19,10 @@ static int player_pos;
 static int is_moving_right;
 static int score;
 
+static vec4 plat_color;
+static vec4 plat_border_color;
+static float border_widht;
+
 //------animation
 static float playerX;
 static float startX;
@@ -52,9 +56,6 @@ static float EaseOutQuad(float t) {
 
 
 static void DrawPlat(void) {
-
-	vec4 plat_color;
-	fill_color(plat_color, 255.0f, 148.0f, 0.1f, 1.0f);
 	int pos_grid[2];
 	float pos_pixel[2];
 	for(int i=0;i<3;i++) {
@@ -65,10 +66,10 @@ static void DrawPlat(void) {
 
 				grid_to_pixel(pos_grid, pos_pixel);
 				if (isMoving == 1) {
-					DrawRoundedRect(pos_pixel[0],pos_pixel[1]+platX,(float)RECT_W,(float)RECT_H,plat_color,(float)BORDER_RADIUS);
+					DrawRoundedRect(pos_pixel[0],pos_pixel[1]+platX,(float)RECT_W,(float)RECT_H,plat_color,(float)BORDER_RADIUS, plat_border_color, border_widht);
 				}
 				else {
-					DrawRoundedRect(pos_pixel[0],pos_pixel[1],(float)RECT_W,(float)RECT_H,plat_color,(float)BORDER_RADIUS);
+					DrawRoundedRect(pos_pixel[0],pos_pixel[1],(float)RECT_W,(float)RECT_H,plat_color,(float)BORDER_RADIUS, plat_border_color, border_widht);
 				}
 			}
 		}
@@ -78,10 +79,10 @@ static void DrawPlat(void) {
 
 			grid_to_pixel(pos_grid, pos_pixel);
 			if (isMoving == 1) {
-				DrawRoundedRect(pos_pixel[0],pos_pixel[1]+platX,(float)RECT_W,(float)RECT_H,plat_color,(float)BORDER_RADIUS);
+				DrawRoundedRect(pos_pixel[0],pos_pixel[1]+platX,(float)RECT_W,(float)RECT_H,plat_color,(float)BORDER_RADIUS, plat_border_color, border_widht);
 			}
 			else {
-				DrawRoundedRect(pos_pixel[0],pos_pixel[1],(float)RECT_W,(float)RECT_H,plat_color,(float)BORDER_RADIUS);
+				DrawRoundedRect(pos_pixel[0],pos_pixel[1],(float)RECT_W,(float)RECT_H,plat_color,(float)BORDER_RADIUS, plat_border_color, border_widht);
 			}
 		}
 	}
@@ -178,7 +179,11 @@ void state_play_init(void) {
 	color_copy(bottColor,bottColor_start);
 
 	fill_color(text_color, 255.0f, 255.0f, 255.0f, 1.0f);
+	fill_color(plat_color, 255.0f, 148.0f, 0.1f, 1.0f);
+	fill_color(plat_border_color, 255.0f, 255.0f, 255.0f, 1.0f);
+	border_widht = 3.0f;
 }
+
 
 
 
@@ -207,9 +212,7 @@ void state_play_update(double dt) {
 
 }
 
-void state_play_run(double dt) {
-
-	dt=dt;
+void state_play_run(void) {
 	glClear(GL_COLOR_BUFFER_BIT);
 	DrawGradientBackground(topColor,bottColor, (4.0f-3.0f*expf(-0.0193f*(float)score))*(float)time);
 

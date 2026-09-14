@@ -44,7 +44,7 @@ int main(void) {
         lastTime = currentTime;
 
 		Game_Update(dt);
-		Game_Run(dt);
+		Game_Run();
 
 
 
