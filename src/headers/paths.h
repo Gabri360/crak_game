@@ -6,4 +6,7 @@
 
 void GetResourcePath(const char* relativePath, char* outBuf, size_t outBufSize);
 
+
+void GetUserDataPath(const char* filename, char* outBuf, size_t outBufSize);
+
 #endif

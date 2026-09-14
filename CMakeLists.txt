@@ -62,15 +62,20 @@ set(VENDOR_SOURCES
 set(RENDER_SOURCES
   src/render/renderer.c
   src/render/shader.c
-  src/render/input.c
-  src/render/paths.c
   src/render/text_renderer.c
+)
+
+set(UTILS_SOURCES
+  src/utils/input.c
+  src/utils/paths.c
+  src/utils/history.c
 )
 
 add_executable(${PROJECT_NAME}
   ${GAME_SOURCES}
   ${VENDOR_SOURCES}
   ${RENDER_SOURCES}
+  ${UTILS_SOURCES}
 )
 
 set_source_files_properties(

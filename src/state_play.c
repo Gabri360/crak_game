@@ -7,12 +7,13 @@
 #include "paths.h"
 #include "game_fun.h"
 #include "config.h"
+#include "history.h"
 
 static GLuint idle_right;
 static GLuint idle_left;
 static GLuint jump_right;
 static GLuint jump_left;
-static double time;
+static double game_time;
 static int plat_state[3][3];
 static int new_plat[3];
 static int player_pos;
@@ -129,6 +130,7 @@ static void update_after_press()
 	if (isMoving == 1) {end_animation();}
     isMoving = 1;
 	if (check_death() == 1) {
+		History_AddScore(score);
 		GameState newstate = STATE_GAMEOVER;
 		Game_SetState(newstate);
 	}
@@ -143,7 +145,7 @@ static void draw_play_text()
 	snprintf(text, sizeof(text),"SCORE: %d", score);
 	DrawText(text, 20.0f, 40.0f, 0.7f, text_color, text_border_color, text_border_widht);
 
-	snprintf(text, sizeof(text),"TIME: %.1f", time);
+	snprintf(text, sizeof(text),"TIME: %.1f", game_time);
 	DrawText(text, (float)WIN_W-175.0f, 40.0f, 0.7f, text_color, text_border_color, text_border_widht);
 
 }
@@ -170,7 +172,7 @@ void state_play_init(void) {
     isMoving = 0;
 	platX = 0;
 	score = 0;
-	time = 0;
+	game_time = 0;
 
 	fill_color(topColor_start, 0.1f, 255.0f, 0.1f, 1.0f);
 	fill_color(bottColor_start, 155.1f, 30.1f, 155.1f, 1.0f);
@@ -208,18 +210,19 @@ void state_play_update(double dt) {
 		platX = Lerp(0,(float)(WIN_H/3),EaseOutQuad(t));
     }
 
-	if (time>=20.0f) {
+	if (game_time>=20.0f) {
+		History_AddScore(score);
 		GameState newstate = STATE_GAMEOVER;
 		Game_SetState(newstate);
 	}
 
-	time += dt;
+	game_time += dt;
 
 }
 
 void state_play_run(void) {
 	glClear(GL_COLOR_BUFFER_BIT);
-	DrawGradientBackground(topColor,bottColor, (4.0f-3.0f*expf(-0.0193f*(float)score))*(float)time);
+	DrawGradientBackground(topColor,bottColor, (4.0f-3.0f*expf(-0.0193f*(float)score))*(float)game_time);
 
 
 	DrawPlat();
