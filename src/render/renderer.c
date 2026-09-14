@@ -186,7 +186,7 @@ void DrawGradientBackground(vec4 colorTop, vec4 colorBottom, float time) {
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void DrawText(const char *text, float x, float y, float scale, vec4 color)
+void DrawText(const char *text, float x, float y, float scale, vec4 color, vec4 outlineColor, float outlineWidth)
 {
-    TextRenderer_Draw(text, x, y, scale, color);
+    TextRenderer_Draw(text, x, y, scale, color, outlineColor, outlineWidth);
 }

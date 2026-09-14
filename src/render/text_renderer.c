@@ -6,6 +6,9 @@
 #include <glad/glad.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#define TEXT_OUTLINE_PADDING 6
 
 #define TEXT_CHARACTER_COUNT 128
 
@@ -15,8 +18,7 @@ static GLuint textVAO;
 static GLuint textVBO;
 static GLuint textShaderProgram;
 
-static GLint locTextProj;
-static GLint locTextColor;
+static GLint locTextProj, locTextColor, locTextOutlineColor, locTextOutlineWidth;
 
 void TextRenderer_Init(const char *fontPath, int fontSize, int screenWidth, int screenHeight)
 {
@@ -30,6 +32,8 @@ void TextRenderer_Init(const char *fontPath, int fontSize, int screenWidth, int 
 
     locTextProj = glGetUniformLocation(textShaderProgram, "uProj");
     locTextColor = glGetUniformLocation(textShaderProgram, "uColor");
+	locTextOutlineColor = glGetUniformLocation(textShaderProgram, "uOutlineColor");
+	locTextOutlineWidth = glGetUniformLocation(textShaderProgram, "uOutlineWidth");
 
     FT_Library ft;
 
@@ -50,28 +54,52 @@ void TextRenderer_Init(const char *fontPath, int fontSize, int screenWidth, int 
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-    for (unsigned int c = 0; c < TEXT_CHARACTER_COUNT; c++) {
-        if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
-            fprintf(stderr, "[Warning] Failed to load character %u\n", c);
-            continue;
-        }
 
-        glGenTextures(1, &characters[c].texture);
-        glBindTexture(GL_TEXTURE_2D, characters[c].texture);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, (GLsizei)face->glyph->bitmap.width, (GLsizei)face->glyph->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
+	for (unsigned int c = 0; c < TEXT_CHARACTER_COUNT; c++) {
+		if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
+			fprintf(stderr, "[Warning] Failed to load character %u\n", c);
+			continue;
+		}
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		unsigned int srcW = face->glyph->bitmap.width;
+		unsigned int srcH = face->glyph->bitmap.rows;
+		unsigned int dstW = srcW + 2 * TEXT_OUTLINE_PADDING;
+		unsigned int dstH = srcH + 2 * TEXT_OUTLINE_PADDING;
 
-        characters[c].width = (int)face->glyph->bitmap.width;
-        characters[c].height = (int)face->glyph->bitmap.rows;
-        characters[c].bearingX = face->glyph->bitmap_left;
-        characters[c].bearingY = face->glyph->bitmap_top;
-        characters[c].advance = (unsigned int)face->glyph->advance.x;
-    }
+		unsigned char *padded = calloc((size_t)dstW * dstH, 1);
+		if (!padded) {
+			fprintf(stderr, "[Error] Allocazione buffer glifo fallita: %u\n", c);
+			continue;
+		}
+
+		for (unsigned int row = 0; row < srcH; row++) {
+			memcpy(
+				   padded + (size_t)(row + TEXT_OUTLINE_PADDING) * dstW + TEXT_OUTLINE_PADDING,
+				   face->glyph->bitmap.buffer + (size_t)row * srcW,
+				   srcW
+				  );
+		}
+
+		glGenTextures(1, &characters[c].texture);
+		glBindTexture(GL_TEXTURE_2D, characters[c].texture);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, (GLsizei)dstW, (GLsizei)dstH, 0, GL_RED, GL_UNSIGNED_BYTE, padded);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		free(padded);
+
+		characters[c].width  = (int)dstW;
+		characters[c].height = (int)dstH;
+
+		characters[c].bearingX = face->glyph->bitmap_left - TEXT_OUTLINE_PADDING;
+		characters[c].bearingY = face->glyph->bitmap_top + TEXT_OUTLINE_PADDING;
+		characters[c].advance = (unsigned int)face->glyph->advance.x;
+	}
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -100,10 +128,12 @@ void TextRenderer_Init(const char *fontPath, int fontSize, int screenWidth, int 
     glUniformMatrix4fv(locTextProj, 1, GL_FALSE, (float *)projection);
 }
 
-void TextRenderer_Draw(const char *text, float x, float y, float scale, vec4 color)
+void TextRenderer_Draw(const char *text, float x, float y, float scale, vec4 color, vec4 outlineColor, float outlineWidth)
 {
     glUseProgram(textShaderProgram);
     glUniform4fv(locTextColor, 1, color);
+    glUniform4fv(locTextOutlineColor, 1, outlineColor);
+    glUniform1f(locTextOutlineWidth, outlineWidth);
 
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(textVAO);

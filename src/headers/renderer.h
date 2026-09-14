@@ -14,6 +14,6 @@ void DrawGradientBackground(vec4 colorTop, vec4 colorBottom, float time);
 
 GLuint LoadTexture(const char* path);
 
-void DrawText(const char *text, float x, float y, float scale, vec4 color);
+void DrawText(const char *text, float x, float y, float scale, vec4 color, vec4 outlineColor, float outlineWidth);
 
 #endif

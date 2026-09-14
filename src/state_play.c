@@ -40,6 +40,8 @@ static vec4 topColor;
 static vec4 bottColor;
 
 static vec4 text_color;
+static vec4 text_border_color;
+static float text_border_widht;
 
 static float PlayerGridToPixelX(int gridPos) {
     return (float)(gridPos * WIN_W / 3 + WIN_W / 6 - 48);
@@ -139,10 +141,10 @@ static void draw_play_text()
 	char text[32];
 
 	snprintf(text, sizeof(text),"SCORE: %d", score);
-	DrawText(text, 20.0f, 40.0f, 0.7f, text_color);
+	DrawText(text, 20.0f, 40.0f, 0.7f, text_color, text_border_color, text_border_widht);
 
 	snprintf(text, sizeof(text),"TIME: %.1f", time);
-	DrawText(text, (float)WIN_W-175.0f, 40.0f, 0.7f, text_color);
+	DrawText(text, (float)WIN_W-175.0f, 40.0f, 0.7f, text_color, text_border_color, text_border_widht);
 
 }
 
@@ -179,6 +181,9 @@ void state_play_init(void) {
 	color_copy(bottColor,bottColor_start);
 
 	fill_color(text_color, 255.0f, 255.0f, 255.0f, 1.0f);
+	fill_color(text_border_color, 0.1f, 0.1f, 0.1f, 1.0f);
+	text_border_widht = 3.5f;
+
 	fill_color(plat_color, 255.0f, 148.0f, 0.1f, 1.0f);
 	fill_color(plat_border_color, 255.0f, 255.0f, 255.0f, 1.0f);
 	border_widht = 3.0f;
