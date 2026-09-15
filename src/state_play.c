@@ -130,7 +130,7 @@ static void update_after_press()
 	if (isMoving == 1) {end_animation();}
     isMoving = 1;
 	if (check_death() == 1) {
-		History_AddScore(score);
+		History_AddScore(score, game_time);
 		GameState newstate = STATE_GAMEOVER;
 		Game_SetState(newstate);
 	}
@@ -211,7 +211,7 @@ void state_play_update(double dt) {
     }
 
 	if (game_time>=20.0f) {
-		History_AddScore(score);
+		History_AddScore(score, game_time);
 		GameState newstate = STATE_GAMEOVER;
 		Game_SetState(newstate);
 	}

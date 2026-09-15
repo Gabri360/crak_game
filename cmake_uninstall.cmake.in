@@ -1,0 +1,15 @@
+if(NOT EXISTS "@CMAKE_BINARY_DIR@/install_manifest.txt")
+    message(FATAL_ERROR "Unable to find install_manifest.txt: @CMAKE_BINARY_DIR@/install_manifest.txt\n")
+endif()
+
+file(READ "@CMAKE_BINARY_DIR@/install_manifest.txt" files)
+string(REGEX REPLACE "\n" ";" files "${files}")
+
+foreach(file ${files})
+    message(STATUS "Remove: $ENV{DESTDIR}${file}")
+    if(IS_SYMLINK "$ENV{DESTDIR}${file}" OR EXISTS "$ENV{DESTDIR}${file}")
+        file(REMOVE "$ENV{DESTDIR}${file}")
+    else()
+        message(STATUS "File already exists: $ENV{DESTDIR}${file}")
+    endif()
+endforeach()

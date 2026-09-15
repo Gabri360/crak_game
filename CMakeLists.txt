@@ -141,12 +141,26 @@ add_custom_target(refresh_share
 include(GNUInstallDirs)
 
 install(TARGETS ${PROJECT_NAME}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-  )
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
 
 install(DIRECTORY shaders/ DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/shaders)
 install(DIRECTORY assets/  DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/assets)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
-    INSTALL_RESOURCES_DIR="${CMAKE_INSTALL_FULL_DATADIR}/${PROJECT_NAME}"
+  INSTALL_RESOURCES_DIR="${CMAKE_INSTALL_FULL_DATADIR}/${PROJECT_NAME}"
+)
+
+
+#-----------------------------uninstall
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+    IMMEDIATE @ONLY
+)
+
+add_custom_target(uninstall_crak
+  COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake
+  COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_INSTALL_FULL_DATADIR}/${PROJECT_NAME}"
+  COMMENT "Disinstallazione di ${PROJECT_NAME}"
 )

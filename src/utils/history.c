@@ -4,7 +4,7 @@
 
 #define HISTORY_FILENAME "scores.csv"
 
-void History_AddScore(int score) {
+void History_AddScore(int score, double game_time) {
     char path[512];
     GetUserDataPath(HISTORY_FILENAME, path, sizeof(path));
 
@@ -15,7 +15,7 @@ void History_AddScore(int score) {
     }
 
     time_t now = time(NULL);
-    fprintf(f, "%d,%ld\n", score, (long)now);
+    fprintf(f, "%d,%.3lf,%ld\n", score, game_time, (long)now);
     fclose(f);
 }
 
@@ -32,10 +32,12 @@ size_t History_LoadAll(ScoreEntry* outEntries, size_t maxEntries) {
     char line[256];
     while (count < maxEntries && fgets(line, sizeof(line), f)) {
         int score;
+		double game_time;
         long ts;
-        if (sscanf(line, "%d,%ld", &score, &ts) == 2) {
+        if (sscanf(line, "%d,%lf,%ld", &score, &game_time, &ts) == 3) {
             outEntries[count].score = score;
             outEntries[count].timestamp = (time_t)ts;
+			outEntries[count].game_time = game_time;
             count++;
         }
     }
