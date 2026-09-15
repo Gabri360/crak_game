@@ -20,6 +20,8 @@ static int player_pos;
 static int is_moving_right;
 static int score;
 
+static double max_time;
+
 static vec4 plat_color;
 static vec4 plat_border_color;
 static float border_widht;
@@ -44,19 +46,26 @@ static vec4 text_color;
 static vec4 text_border_color;
 static float text_border_widht;
 
+static float noise_gap[2][3][3];
+
+
+
+static void update_noise_gap()
+{
+	float noise_increase = -2.1f*expf(-0.0076f*(float)score)+3.0f;
+	for(int k=0;k<2;k++) {
+		for(int i=0;i<3;i++) {
+			for(int j=0;j<3;j++) {
+				noise_gap[k][i][j] = 1.5f*(cosf(0.2f*(noise_increase)*(float)game_time*(1.0f + (float)(10*i)+(float)(20*j) + (float)(15*k)))+1.0f);
+			}
+		}
+	}
+}
+
+
 static float PlayerGridToPixelX(int gridPos) {
     return (float)(gridPos * WIN_W / 3 + WIN_W / 6 - 48);
 }
-
-static float Lerp(float a, float b, float t) {
-    return a + (b - a) * t;
-}
-
-static float EaseOutQuad(float t) {
-    return 1.0f - (1.0f - t) * (1.0f - t);
-}
-
-
 
 static void DrawPlat(void) {
 	int pos_grid[2];
@@ -72,7 +81,7 @@ static void DrawPlat(void) {
 					DrawRoundedRect(pos_pixel[0],pos_pixel[1]+platX,(float)RECT_W,(float)RECT_H,plat_color,(float)BORDER_RADIUS, plat_border_color, border_widht);
 				}
 				else {
-					DrawRoundedRect(pos_pixel[0],pos_pixel[1],(float)RECT_W,(float)RECT_H,plat_color,(float)BORDER_RADIUS, plat_border_color, border_widht);
+					DrawRoundedRect(pos_pixel[0] + noise_gap[0][i][j],pos_pixel[1] + noise_gap[1][i][j],(float)RECT_W,(float)RECT_H,plat_color,(float)BORDER_RADIUS, plat_border_color, border_widht);
 				}
 			}
 		}
@@ -113,7 +122,7 @@ static int check_death(void)
 
 static void update_background_colors(int score, vec4 topColor, vec4 bottColor)
 {
-    float t = (float)score / 200.0f;
+    float t = (float)score / ((float)max_time*4.5f);
 
     if (t > 1.0f) {t = 1.0f;}
 
@@ -173,6 +182,8 @@ void state_play_init(void) {
 	platX = 0;
 	score = 0;
 	game_time = 0;
+	max_time = 20.0;
+
 
 	fill_color(topColor_start, 0.1f, 255.0f, 0.1f, 1.0f);
 	fill_color(bottColor_start, 155.1f, 30.1f, 155.1f, 1.0f);
@@ -210,13 +221,14 @@ void state_play_update(double dt) {
 		platX = Lerp(0,(float)(WIN_H/3),EaseOutQuad(t));
     }
 
-	if (game_time>=20.0f) {
+	if (game_time>=max_time) {
 		History_AddScore(score, game_time);
 		GameState newstate = STATE_GAMEOVER;
 		Game_SetState(newstate);
 	}
 
 	game_time += dt;
+	update_noise_gap();
 
 }
 

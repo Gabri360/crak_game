@@ -33,6 +33,15 @@ static int row_valid(int row[], int start)
 }
 
 
+float Lerp(float a, float b, float t) {
+    return a + (b - a) * t;
+}
+
+float EaseOutQuad(float t) {
+    return 1.0f - (1.0f - t) * (1.0f - t);
+}
+
+
 void grid_to_pixel(int pos_grid[], float pos_pixel[])
 {
 	int cell_width = WIN_W / 3;
