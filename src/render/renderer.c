@@ -17,15 +17,22 @@ static GLint locModel, locProj, locColor, locUseTexture;
 static GLuint backgroundShaderProgram;
 static GLint locBGModel, locBGProj, locBGColorTop, locBGColorBottom, locBGt;
 
+#define LINE_AA_PADDING 2.0f
+static GLuint lineShaderProgram;
+static GLint locLineModel, locLineProj, locLineColor, locLineOrigin, locLineSize, locLinePointA, locLinePointB, locLineRadius;
+
+
+
 static mat4 projection;
 
 void Renderer_Init(int screenWidth, int screenHeight) {
     // --- Shader ---
-	char vertPath[512], fragPath[512], rrFragPath[512], bgFragPath[512];
+	char vertPath[512], fragPath[512], rrFragPath[512], bgFragPath[512], lineFragPath[512];
     GetResourcePath("shaders/sprite.vert", vertPath, sizeof(vertPath));
     GetResourcePath("shaders/sprite.frag", fragPath, sizeof(fragPath));
 	GetResourcePath("shaders/rounded_rect.frag", rrFragPath, sizeof(rrFragPath));
 	GetResourcePath("shaders/background.frag", bgFragPath, sizeof(bgFragPath));
+	GetResourcePath("shaders/line.frag", lineFragPath, sizeof(lineFragPath));
 
     shaderProgram = LoadShaderProgram(vertPath, fragPath);
     locModel = glGetUniformLocation(shaderProgram, "uModel");
@@ -52,6 +59,15 @@ void Renderer_Init(int screenWidth, int screenHeight) {
 	locBGt = glGetUniformLocation(backgroundShaderProgram, "ut");
 
 
+	lineShaderProgram = LoadShaderProgram(vertPath, lineFragPath);
+	locLineModel   = glGetUniformLocation(lineShaderProgram, "uModel");
+	locLineProj    = glGetUniformLocation(lineShaderProgram, "uProj");
+	locLineColor   = glGetUniformLocation(lineShaderProgram, "uColor");
+	locLineOrigin  = glGetUniformLocation(lineShaderProgram, "uOrigin");
+	locLineSize    = glGetUniformLocation(lineShaderProgram, "uSize");
+	locLinePointA  = glGetUniformLocation(lineShaderProgram, "uPointA");
+	locLinePointB  = glGetUniformLocation(lineShaderProgram, "uPointB");
+	locLineRadius  = glGetUniformLocation(lineShaderProgram, "uRadius");
 
     float quadVertices[] = {
         0.0f, 1.0f,  0.0f, 1.0f,
@@ -95,7 +111,7 @@ void Renderer_Shutdown(void) {
     glDeleteProgram(shaderProgram);
     glDeleteProgram(roundedShaderProgram);
     glDeleteProgram(backgroundShaderProgram);
-
+	glDeleteProgram(lineShaderProgram);
 }
 
 static void DrawQuad(GLuint texture, float x, float y, float w, float h, vec4 color, int useTexture) {
@@ -189,4 +205,38 @@ void DrawGradientBackground(vec4 colorTop, vec4 colorBottom, float time) {
 void DrawText(const char *text, float x, float y, float scale, vec4 color, vec4 outlineColor, float outlineWidth)
 {
     TextRenderer_Draw(text, x, y, scale, color, outlineColor, outlineWidth);
+}
+
+
+void DrawLine(float x1, float y1, float x2, float y2, float thickness, vec4 color)
+{
+    float radius = thickness * 0.5f;
+
+    float minX = fminf(x1, x2) - radius - LINE_AA_PADDING;
+    float maxX = fmaxf(x1, x2) + radius + LINE_AA_PADDING;
+    float minY = fminf(y1, y2) - radius - LINE_AA_PADDING;
+    float maxY = fmaxf(y1, y2) + radius + LINE_AA_PADDING;
+
+    float originX = minX;
+    float originY = minY;
+    float w = maxX - minX;
+    float h = maxY - minY;
+
+    mat4 model;
+    glm_mat4_identity(model);
+    glm_translate(model, (vec3){originX, originY, 0.0f});
+    glm_scale(model, (vec3){w, h, 1.0f});
+
+    glUseProgram(lineShaderProgram);
+    glUniformMatrix4fv(locLineModel, 1, GL_FALSE, (float*)model);
+    glUniformMatrix4fv(locLineProj, 1, GL_FALSE, (float*)projection);
+    glUniform4fv(locLineColor, 1, color);
+    glUniform2f(locLineOrigin, originX, originY);
+    glUniform2f(locLineSize, w, h);
+    glUniform2f(locLinePointA, x1, y1);
+    glUniform2f(locLinePointB, x2, y2);
+    glUniform1f(locLineRadius, radius);
+
+    glBindVertexArray(quadVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }

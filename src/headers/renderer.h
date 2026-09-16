@@ -16,4 +16,6 @@ GLuint LoadTexture(const char* path);
 
 void DrawText(const char *text, float x, float y, float scale, vec4 color, vec4 outlineColor, float outlineWidth);
 
+void DrawLine(float x1, float y1, float x2, float y2, float thickness, vec4 color);
+
 #endif

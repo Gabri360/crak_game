@@ -9,7 +9,7 @@
 #include "config.h"
 #include "state_play.h"
 
-static double time;
+static double game_time;
 static vec4 icon_color;
 static float rect_w;
 static float rect_h;
@@ -28,11 +28,11 @@ void state_paused_init(void) {
 }
 
 void state_paused_enter(void) {
-	time = 0;
+	game_time = 0;
 }
 
 void state_paused_update(double dt) {
-	time += dt;
+	game_time += dt;
 }
 
 void state_paused_run(void) {

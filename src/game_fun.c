@@ -113,3 +113,61 @@ void color_copy(vec4 color1, vec4 color2)
 		color1[i] = color2[i];
 	}
 }
+
+int max_score(ScoreEntry history[], int max_count)
+{
+	int max = history[0].score;
+	for(int i=1;i<max_count;i++) {
+		if (history[i].score > max) {
+			max = history[i].score;
+		}
+	}
+	return max;
+}
+
+int top_five_scores(ScoreEntry history[], int max_count, int result[])
+{
+    int count = 0;
+
+    for (int i = 0; i < max_count; i++) {
+        int x = history[i].score;
+
+        int is_present = 0;
+        for (int j = 0; j < count; j++) {
+            if (result[j] == x) {
+                is_present = 1;
+                break;
+            }
+        }
+
+        if (is_present) {continue;}
+
+        int pos = 0;
+        while (pos < count && result[pos] > x) {
+            pos++;
+        }
+
+        if (pos >= 5 && count == 5) {continue;}
+
+        int limit;
+
+		if (count <= 4) {
+			limit = count;
+		}
+		else {
+			limit = 4;
+		}
+
+        for (int j = limit; j > pos; j--) {
+            result[j] = result[j - 1];
+        }
+
+        result[pos] = x;
+
+        if (count < 5) {
+            count++;
+        }
+    }
+
+    return count;
+}

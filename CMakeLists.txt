@@ -131,10 +131,18 @@ add_custom_target(refresh_share
   COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/assets
   COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/shaders
   COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_SOURCE_DIR}/shaders ${CMAKE_BINARY_DIR}/shaders
+  ${CMAKE_SOURCE_DIR}/shaders ${CMAKE_BINARY_DIR}/shaders
   COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/assets
+  ${CMAKE_SOURCE_DIR}/assets ${CMAKE_BINARY_DIR}/assets
 
+)
+
+add_custom_target(clean_saves
+  COMMAND ${CMAKE_COMMAND} -E remove -f
+  "$ENV{HOME}/.local/share/${PROJECT_NAME}/scores.csv"
+  COMMAND ${CMAKE_COMMAND} -E touch
+  "$ENV{HOME}/.local/share/${PROJECT_NAME}/scores.csv"
+  COMMENT "clean saves"
 )
 
 #-----------------------------install

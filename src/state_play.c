@@ -14,6 +14,7 @@ static GLuint idle_left;
 static GLuint jump_right;
 static GLuint jump_left;
 static double game_time;
+static double time_in_state;
 static int plat_state[3][3];
 static int new_plat[3];
 static int player_pos;
@@ -48,7 +49,10 @@ static float text_border_widht;
 
 static float noise_gap[2][3][3];
 
-
+#define max_history_load 3000
+static ScoreEntry history[max_history_load];
+static size_t count_history_load;
+static int record;
 
 static void update_noise_gap()
 {
@@ -56,7 +60,7 @@ static void update_noise_gap()
 	for(int k=0;k<2;k++) {
 		for(int i=0;i<3;i++) {
 			for(int j=0;j<3;j++) {
-				noise_gap[k][i][j] = 1.5f*(cosf(0.2f*(noise_increase)*(float)game_time*(1.0f + (float)(10*i)+(float)(20*j) + (float)(15*k)))+1.0f);
+				noise_gap[k][i][j] = 1.5f*(cosf(0.2f*(noise_increase)*(float)time_in_state*(1.0f + (float)(10*i)+(float)(20*j) + (float)(15*k)))+1.0f);
 			}
 		}
 	}
@@ -139,7 +143,8 @@ static void update_after_press()
 	if (isMoving == 1) {end_animation();}
     isMoving = 1;
 	if (check_death() == 1) {
-		History_AddScore(score, game_time);
+		if (score != 0)
+			History_AddScore(score, game_time);
 		GameState newstate = STATE_GAMEOVER;
 		Game_SetState(newstate);
 	}
@@ -156,6 +161,14 @@ static void draw_play_text()
 
 	snprintf(text, sizeof(text),"TIME: %.1f", game_time);
 	DrawText(text, (float)WIN_W-175.0f, 40.0f, 0.7f, text_color, text_border_color, text_border_widht);
+
+	if (score < record) {
+		snprintf(text, sizeof(text),"RECORD: %d", record);
+	}
+	else {
+		snprintf(text, sizeof(text),"RECORD: %d", score);
+	}
+	DrawText(text, 20.0f, 70.0f, 0.4f, text_color, text_border_color, text_border_widht);
 
 }
 
@@ -182,6 +195,7 @@ void state_play_init(void) {
 	platX = 0;
 	score = 0;
 	game_time = 0;
+	time_in_state = 0;
 	max_time = 20.0;
 
 
@@ -200,6 +214,9 @@ void state_play_init(void) {
 	fill_color(plat_color, 255.0f, 148.0f, 0.1f, 1.0f);
 	fill_color(plat_border_color, 255.0f, 255.0f, 255.0f, 1.0f);
 	border_widht = 3.0f;
+
+	count_history_load = History_LoadAll(history, (size_t)max_history_load);
+	record = max_score(history, (int)count_history_load);
 }
 
 
@@ -222,12 +239,17 @@ void state_play_update(double dt) {
     }
 
 	if (game_time>=max_time) {
-		History_AddScore(score, game_time);
+		if (score != 0)
+			History_AddScore(score, game_time);
 		GameState newstate = STATE_GAMEOVER;
 		Game_SetState(newstate);
 	}
 
-	game_time += dt;
+
+	if (score != 0) {
+		game_time += dt;
+	}
+	time_in_state += dt;
 	update_noise_gap();
 
 }
