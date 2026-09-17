@@ -15,4 +15,7 @@
 
 #define PLAYER_MOVE_DURATION 0.15
 
+#define IDLE_HOLD_TIME 1.0
+#define IDLE_FRAME_TIME 0.15
+
 #endif

@@ -8,13 +8,15 @@
 #include "game_fun.h"
 #include "config.h"
 #include "history.h"
+#include <string.h>
 
-static GLuint idle_right;
-static GLuint idle_left;
+static GLuint idle_right[9];
+static GLuint idle_left[9];
 static GLuint jump_right;
 static GLuint jump_left;
 static double game_time;
 static double time_in_state;
+static double time_stop;
 static int plat_state[3][3];
 static int new_plat[3];
 static int player_pos;
@@ -54,6 +56,10 @@ static float noise_gap[2][3][3];
 static ScoreEntry history[max_history_load];
 static size_t count_history_load;
 static int record;
+
+
+
+
 
 static void update_noise_gap()
 {
@@ -185,12 +191,47 @@ static void draw_record_line() {
 	}
 }
 
+static void load_idle() {
+	char sprite_Path[512];
+	char temp_path[32];
+	for (int i=1; i<10;i++) {
+		snprintf(temp_path, sizeof(temp_path), "assets/idle/idle_right%d.png", i);
+		GetResourcePath(temp_path, sprite_Path, sizeof(sprite_Path));
+		idle_right[i-1] = LoadTexture(sprite_Path);
+
+		snprintf(temp_path, sizeof(temp_path), "assets/idle/idle_left%d.png", i);
+		GetResourcePath(temp_path, sprite_Path, sizeof(sprite_Path));
+		idle_left[i-1] = LoadTexture(sprite_Path);
+	}
+}
+
+
+
+static GLuint idle_choose() {
+
+    double animDuration = (double)8 * IDLE_FRAME_TIME;
+    double cycleLength = animDuration + IDLE_HOLD_TIME;
+
+    if (time_stop < 0.2) {
+        return is_moving_right ? idle_right[0] : idle_left[0];
+    }
+
+    double t = fmod(time_stop - 0.2, cycleLength);
+
+    if (t < animDuration) {
+        int i = (int)(t / IDLE_FRAME_TIME) + 1;
+        if (i > 8) i = 8;
+        return is_moving_right ? idle_right[i] : idle_left[i];
+    } else {
+        return is_moving_right ? idle_right[0] : idle_left[0];
+    }
+}
+
+
+
 void state_play_init(void) {
     char sprite_Path[512];
-    GetResourcePath("assets/idle_right.png", sprite_Path, sizeof(sprite_Path));
-    idle_right = LoadTexture(sprite_Path);
-	GetResourcePath("assets/idle_left.png", sprite_Path, sizeof(sprite_Path));
-    idle_left = LoadTexture(sprite_Path);
+	load_idle();
 	GetResourcePath("assets/jump_right.png", sprite_Path, sizeof(sprite_Path));
     jump_right = LoadTexture(sprite_Path);
 	GetResourcePath("assets/jump_left.png", sprite_Path, sizeof(sprite_Path));
@@ -210,6 +251,7 @@ void state_play_init(void) {
 	game_time = 0;
 	time_in_state = 0;
 	max_time = 20.0;
+	time_stop = 0.0;
 
 
 	fill_color(color_dash_line, 255.0f, 0.1f, 0.1f, 0.5f);
@@ -250,7 +292,9 @@ void state_play_update(double dt) {
         }
         playerX = Lerp(startX, targetX, EaseOutQuad(t));
 		platX = Lerp(0,(float)(WIN_H/3),EaseOutQuad(t));
+		time_stop = 0;
     }
+	else {time_stop += dt;}
 
 	if (game_time>=max_time) {
 		if (score != 0)
@@ -281,7 +325,7 @@ void state_play_run(void) {
 		currentSprite = is_moving_right ? jump_right : jump_left;
 	}
 	else {
-		currentSprite = is_moving_right ? idle_right : idle_left;
+		currentSprite = idle_choose();
 	}
 	DrawSprite(currentSprite, playerX-20, (float)(WIN_H * 5 / 6 - 143), 140.0f, 140.0f);
 
