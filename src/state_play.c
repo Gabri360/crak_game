@@ -46,6 +46,10 @@ static vec4 bottColor_end;
 static vec4 topColor;
 static vec4 bottColor;
 
+static vec4 timer_load_color_bg;
+static vec4 timer_load_color;
+static float time_load_lenght;
+
 static vec4 text_color;
 static vec4 text_border_color;
 static float text_border_widht;
@@ -60,8 +64,13 @@ static int record;
 
 
 
+static void draw_time_load_bar(void)
+{
+	DrawLine((float)(WIN_W-165),60.0f,(float)(WIN_W-165)+time_load_lenght, 60.0f, 15.0f,timer_load_color_bg);
+	DrawLine((float)(WIN_W-165),60.0f,(float)(WIN_W-165) + (float)game_time*time_load_lenght/20.0f, 60.0f, 10.0f,timer_load_color);
+}
 
-static void update_noise_gap()
+static void update_noise_gap(void)
 {
 	float noise_increase = -2.1f*expf(-0.0076f*(float)score)+3.0f;
 	for(int k=0;k<2;k++) {
@@ -227,6 +236,13 @@ static GLuint idle_choose() {
     }
 }
 
+static void updateTimerColor(void) {
+    float t = (float)game_time / 20.0f;
+    if (t > 1.0f) {t = 1.0f;}
+
+    timer_load_color[1] = Lerp(1.0f, 0.0f, t);
+}
+
 
 
 void state_play_init(void) {
@@ -259,6 +275,11 @@ void state_play_init(void) {
 	fill_color(bottColor_start, 155.1f, 30.1f, 155.1f, 1.0f);
 	fill_color(topColor_end, 255.0f, 0.1f, 0.1f, 1.0f);
 	fill_color(bottColor_end, 0.1f, 0.1f, 255.0f, 1.0f);
+
+	//fill_color(timer_load_color_bg, 255.0f, 255.0f, 255.0f, 0.3f);
+	fill_color(timer_load_color_bg, 0.1f, 0.1f, 0.1f, 0.35f);
+	fill_color(timer_load_color, 255.0f, 255.0f, 20.0f, 1.0f);
+	time_load_lenght = 147.0f;
 
 	color_copy(topColor,topColor_start);
 	color_copy(bottColor,bottColor_start);
@@ -309,6 +330,7 @@ void state_play_update(double dt) {
 	}
 	time_in_state += dt;
 	update_noise_gap();
+	updateTimerColor();
 
 }
 
@@ -332,6 +354,8 @@ void state_play_run(void) {
 	draw_record_line();
 
 	draw_play_text();
+
+	draw_time_load_bar();
 }
 
 
