@@ -36,6 +36,7 @@ static int isMoving;
 static float platX;
 
 
+static vec4 color_dash_line;
 static vec4 topColor_start;
 static vec4 topColor_end;
 static vec4 bottColor_start;
@@ -172,6 +173,18 @@ static void draw_play_text()
 
 }
 
+static void draw_record_line() {
+	static int temp_score;
+	if (isMoving == 0) {temp_score = score;}
+	float line_pos = (float)(-WIN_H*(record-temp_score)/3 + WIN_H*2/3 + 50);
+	if (isMoving == 1) {
+		DrawDashedLine(0.0f, line_pos + platX, (float)WIN_W, line_pos + platX, 3.5f, 50.0f, 15.0f, color_dash_line);
+	}
+	else {
+		DrawDashedLine(0.0f, line_pos, (float)WIN_W, line_pos, 3.5f, 50.0f, 15.0f, color_dash_line);
+	}
+}
+
 void state_play_init(void) {
     char sprite_Path[512];
     GetResourcePath("assets/idle_right.png", sprite_Path, sizeof(sprite_Path));
@@ -199,6 +212,7 @@ void state_play_init(void) {
 	max_time = 20.0;
 
 
+	fill_color(color_dash_line, 255.0f, 0.1f, 0.1f, 0.5f);
 	fill_color(topColor_start, 0.1f, 255.0f, 0.1f, 1.0f);
 	fill_color(bottColor_start, 155.1f, 30.1f, 155.1f, 1.0f);
 	fill_color(topColor_end, 255.0f, 0.1f, 0.1f, 1.0f);
@@ -271,6 +285,7 @@ void state_play_run(void) {
 	}
 	DrawSprite(currentSprite, playerX-20, (float)(WIN_H * 5 / 6 - 143), 140.0f, 140.0f);
 
+	draw_record_line();
 
 	draw_play_text();
 }

@@ -240,3 +240,31 @@ void DrawLine(float x1, float y1, float x2, float y2, float thickness, vec4 colo
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
+
+void DrawDashedLine(float x1, float y1, float x2, float y2, float thickness, float dashLength, float gapLength, vec4 color) {
+    float dx = x2 - x1;
+    float dy = y2 - y1;
+    float totalLength = sqrtf(dx * dx + dy * dy);
+
+    if (totalLength < 0.0001f) return;
+
+    float dirX = dx / totalLength;
+    float dirY = dy / totalLength;
+
+    float patternLength = dashLength + gapLength;
+    float distanceCovered = 0.0f;
+
+    while (distanceCovered < totalLength) {
+        float dashStart = distanceCovered;
+        float dashEnd = fminf(distanceCovered + dashLength, totalLength);
+
+        float startX = x1 + dirX * dashStart;
+        float startY = y1 + dirY * dashStart;
+        float endX   = x1 + dirX * dashEnd;
+        float endY   = y1 + dirY * dashEnd;
+
+        DrawLine(startX, startY, endX, endY, thickness, color);
+
+        distanceCovered += patternLength;
+    }
+}
