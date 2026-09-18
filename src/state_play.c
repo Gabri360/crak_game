@@ -35,7 +35,19 @@ static float startX;
 static float targetX;
 static float moveElapsed;
 static int isMoving;
+static int isPaused;
+static double time_post_paused;
 static float platX;
+
+static float PstartX;
+static float PendX;
+static float PposX;
+static vec4 icon_color;
+static float rect_w;
+static float rect_h;
+static float border_radius_icon;
+static vec4 border_color;
+static float border_widht;
 
 
 static vec4 color_dash_line;
@@ -243,7 +255,12 @@ static void updateTimerColor(void) {
     timer_load_color[1] = Lerp(1.0f, 0.0f, t);
 }
 
-
+static void draw_pause_icon(){
+	if (isPaused && time_post_paused!=0) {
+		DrawRoundedRect(((float)WIN_W/3.0f-rect_w/2.0f)+(float)WIN_W/12.0f+PposX,(float)WIN_H/3.0f,rect_w,rect_h,icon_color,border_radius_icon, border_color, border_widht);
+		DrawRoundedRect(((float)WIN_W*2.0f/3.0f-rect_w/2.0f)-(float)WIN_W/12.0f+PposX,(float)WIN_H/3.0f,rect_w,rect_h,icon_color,border_radius_icon, border_color, border_widht);
+	}
+}
 
 void state_play_init(void) {
     char sprite_Path[512];
@@ -262,12 +279,17 @@ void state_play_init(void) {
     startX = playerX;
     targetX = playerX;
     isMoving = 0;
+	isPaused = 0;
+	time_post_paused = 0.0;
 	platX = 0;
 	score = 0;
 	game_time = 0;
 	time_in_state = 0;
 	max_time = 20.0;
 	time_stop = 0.0;
+	PstartX = 0.0f;
+	PendX = 0.0f;
+	PposX = 0.0f;
 
 
 	fill_color(color_dash_line, 255.0f, 0.1f, 0.1f, 0.5f);
@@ -294,12 +316,22 @@ void state_play_init(void) {
 
 	count_history_load = History_LoadAll(history, (size_t)max_history_load);
 	record = max_score(history, (int)count_history_load);
+
+	fill_color(icon_color, 255.0f, 148.0f, 0.1f, 1.0f);
+	border_radius_icon = 20.0f;
+	rect_w = (float)WIN_W/18.0f;
+	rect_h = (float)WIN_H/3.0f;
+	fill_color(border_color, 255.0f, 255.0f, 255.0f, 1.0f);
+	border_widht = 3.0f;
 }
 
 
 
 
 void state_play_enter(void) {
+	PstartX = 0.0f;
+	PendX = (float)(WIN_W*3/5);
+	time_post_paused = 0;
 }
 
 void state_play_update(double dt) {
@@ -332,6 +364,14 @@ void state_play_update(double dt) {
 	update_noise_gap();
 	updateTimerColor();
 
+	if (isPaused) {
+		time_post_paused += (float)dt;
+		float tp = (float)time_post_paused/ (float)PAUSE_MOVE_DURATION;
+		if(tp>= 1.0f) {tp = 1.0f; isPaused = 0; time_post_paused = 0;}
+		PposX = Lerp(PendX, PstartX, EaseOutBack(1.0f-tp));
+
+	}
+
 }
 
 void state_play_run(void) {
@@ -356,6 +396,10 @@ void state_play_run(void) {
 	draw_play_text();
 
 	draw_time_load_bar();
+
+	draw_pause_icon();
+
+
 }
 
 
@@ -369,6 +413,7 @@ void state_play_handle_events(GLFWwindow* window) {
 	if (Input_KeyPressed(window, GLFW_KEY_SPACE)) {
 		GameState newstate = STATE_PAUSED;
 		Game_SetState(newstate);
+		isPaused = 1;
 	}
 
     if ((Input_KeyPressed(window, GLFW_KEY_RIGHT) || Input_KeyPressed(window, GLFW_KEY_D)) && player_pos != 2) {

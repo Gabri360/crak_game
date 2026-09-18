@@ -45,6 +45,13 @@ float EaseOutQuad(float t) {
     return 1.0f - (1.0f - t) * (1.0f - t);
 }
 
+float EaseOutBack(float t) {
+    const float c1 = 1.70158f;
+    const float c3 = c1 + 1.0f;
+
+    float tm1 = t - 1.0f;
+    return 1.0f + c3 * tm1 * tm1 * tm1 + c1 * tm1 * tm1;
+}
 
 void grid_to_pixel(int pos_grid[], float pos_pixel[])
 {
