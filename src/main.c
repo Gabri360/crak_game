@@ -6,6 +6,10 @@
 #include "renderer.h"
 #include "gamestate.h"
 #include "config.h"
+#include "game_fun.h"
+
+
+
 
 int main(void) {
     if (!glfwInit()) {
@@ -23,6 +27,8 @@ int main(void) {
         glfwTerminate();
         return -1;
     }
+
+	SetWindowIcon(window);
     glfwMakeContextCurrent(window);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {

@@ -14,4 +14,6 @@ void fill_color(vec4 color, float r, float g, float b, float a);
 void color_copy(vec4 color1, vec4 color2);
 int max_score(ScoreEntry history[], int max_count);
 
+void SetWindowIcon(GLFWwindow *window);
+
 #endif

@@ -1,9 +1,13 @@
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
 #include "renderer.h"
 #include <stdlib.h>
 #include <time.h>
 #include "game_fun.h"
 #include "config.h"
 #include <stdio.h>
+#include "paths.h"
+#include "stb_image.h"
 
 static int myRand(int x, int y)
 {
@@ -170,4 +174,28 @@ int top_five_scores(ScoreEntry history[], int max_count, int result[])
     }
 
     return count;
+}
+
+void SetWindowIcon(GLFWwindow *window)
+{
+    char icon_path[64];
+
+    GetResourcePath("assets/idle/idle_right1.png", icon_path, sizeof(icon_path));
+
+    int width;
+    int height;
+    int channels;
+
+    unsigned char *pixels = stbi_load(icon_path, &width, &height, &channels, 4);
+
+    if (pixels == NULL) {
+        fprintf(stderr, "[ERROR] failed to load window icon: %s\n", icon_path);
+        return;
+    }
+
+    GLFWimage icon = {.width = width, .height = height, .pixels = pixels};
+
+    glfwSetWindowIcon(window, 1, &icon);
+
+    stbi_image_free(pixels);
 }
