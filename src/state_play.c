@@ -14,6 +14,8 @@ static GLuint idle_right[9];
 static GLuint idle_left[9];
 static GLuint jump_right;
 static GLuint jump_left;
+static GLuint skull_right;
+static GLuint skull_left;
 static double game_time;
 static double time_in_state;
 static double time_stop;
@@ -22,6 +24,7 @@ static int new_plat[3];
 static int player_pos;
 static int is_moving_right;
 static int score;
+static int isAlive;
 
 static double max_time;
 
@@ -178,6 +181,7 @@ static void update_after_press()
 			History_AddScore(score, game_time);
 		GameState newstate = STATE_GAMEOVER;
 		Game_SetState(newstate);
+		isAlive = 0;
 	}
 	else {score++; update_background_colors(score,topColor,bottColor);}
 	add_row(new_plat,player_pos);
@@ -233,6 +237,8 @@ static void load_idle() {
 
 static GLuint idle_choose() {
 
+	if (isAlive == 0) {return is_moving_right ? skull_right : skull_left;}
+
     double animDuration = (double)8 * IDLE_FRAME_TIME;
     double cycleLength = animDuration + IDLE_HOLD_TIME;
 
@@ -275,6 +281,10 @@ void state_play_init(void) {
     jump_right = LoadTexture(sprite_Path);
 	GetResourcePath("assets/jump_left.png", sprite_Path, sizeof(sprite_Path));
     jump_left = LoadTexture(sprite_Path);
+	GetResourcePath("assets/skull_right.png", sprite_Path, sizeof(sprite_Path));
+    skull_right = LoadTexture(sprite_Path);
+	GetResourcePath("assets/skull_left.png", sprite_Path, sizeof(sprite_Path));
+    skull_left = LoadTexture(sprite_Path);
 
 	player_pos = 1;
 	is_moving_right = 1;
@@ -296,6 +306,7 @@ void state_play_init(void) {
 	PstartX = 0.0f;
 	PendX = 0.0f;
 	PposX = 0.0f;
+	isAlive = 1;
 
 
 	fill_color(color_dash_line, 255.0f, 0.1f, 0.1f, 0.5f);
@@ -340,6 +351,7 @@ void state_play_enter(void) {
 	PstartX = 0.0f;
 	PendX = (float)(WIN_W*3/5);
 	time_post_paused = 0;
+	isAlive = 1;
 }
 
 void state_play_update(double dt) {
@@ -362,10 +374,11 @@ void state_play_update(double dt) {
 			History_AddScore(score, game_time);
 		GameState newstate = STATE_GAMEOVER;
 		Game_SetState(newstate);
+		isAlive = 0;
 	}
 
 
-	if (score != 0) {
+	if (score != 0 && isAlive) {
 		game_time += dt;
 	}
 	time_in_state += dt;

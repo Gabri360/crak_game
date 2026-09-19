@@ -9,8 +9,6 @@
 #include "game_fun.h"
 #include "config.h"
 
-static GLuint skull;
-
 #define max_history_load 3000
 static ScoreEntry history[max_history_load];
 static size_t count_history_load;
@@ -29,45 +27,76 @@ static vec4 text_color;
 static vec4 text_border_color;
 static float text_border_width;
 
+static float lb_anim_time;
+static double game_time;
+
 static void draw_leaderboard() {
 
 	float coord_lb[2] = {(float)(WIN_W/6), (float)(WIN_H/6)};
 	float dim_lb[2] = {(float)WIN_W-2.0f*coord_lb[0], (float)WIN_H-2.0f*coord_lb[1]};
-	DrawRoundedRect((coord_lb[0]),(coord_lb[1]),dim_lb[0],dim_lb[1],color_leaderboard,border_radius_lb,color_leaderboard_border, border_width_lb);
 
-	char text[32];
+	float revealW, revealH;
 
-	snprintf(text, sizeof(text), "Leaderboard");
-	DrawText(text, coord_lb[0]+dim_lb[0]/2.0f-150.0f,coord_lb[1]+70.0f,1.0f, text_color,text_border_color,text_border_width);
+    if (lb_anim_time < LB_ANIM_PHASE1_DURATION) {
+        float t = lb_anim_time / LB_ANIM_PHASE1_DURATION;
+        float eased = EaseOutQuad(t);
+        revealW = Lerp(0.0f, dim_lb[0], eased);
+        revealH = LB_ANIM_LINE_THICKNESS;
+    } else {
+        revealW = dim_lb[0];
+        float t2 = (lb_anim_time - LB_ANIM_PHASE1_DURATION) / LB_ANIM_PHASE2_DURATION;
+        if (t2 > 1.0f) t2 = 1.0f;
+        float eased2 = EaseOutQuad(t2);
+        revealH = Lerp(LB_ANIM_LINE_THICKNESS, dim_lb[1], eased2);
+    }
 
-	DrawLine(coord_lb[0]+4.0f,coord_lb[1]+95.0f,coord_lb[0]+dim_lb[0]-4.0f, coord_lb[1]+95.0f,line_width,color_line);
+    if (revealW < 1.0f) revealW = 1.0f;
+    if (revealH < 1.0f) revealH = 1.0f;
 
-	float text_scale = 1.0f;
-	float offset = 0.0f;
+    float centerX = coord_lb[0] + dim_lb[0] / 2.0f;
+    float centerY = coord_lb[1] + dim_lb[1] / 2.0f;
+    float revealX = centerX - revealW / 2.0f;
+    float revealY = centerY - revealH / 2.0f;
 
-	for(int i=0;i<n_records;i++) {
-		snprintf(text, sizeof(text), "%d)        %d", i+1, records[i]);
-		DrawText(text, (coord_lb[0]+130.0f+offset),(coord_lb[1]+150.0f+(float)(i*50)), text_scale, text_color, text_border_color, text_border_width);
-		text_scale = 0.7f;
-		offset = 50.0f;
-	}
-	float lineH;
-	for(int i=0;i<n_records;i++) {
-		lineH = 95.0f + (float)(i)*49.0f + 73.0f;
-		if (i<n_records-1) {
-			DrawLine(coord_lb[0]+4.0f,coord_lb[1]+lineH,coord_lb[0]+dim_lb[0]-4.0f, coord_lb[1]+lineH,line_width,color_line2);
+    glEnable(GL_SCISSOR_TEST);
+    glScissor((int)revealX, (int)((float)WIN_H - (revealY + revealH)), (int)revealW, (int)revealH);
+	//DrawRoundedRect((coord_lb[0]),(coord_lb[1]),dim_lb[0],dim_lb[1],color_leaderboard,border_radius_lb,color_leaderboard_border, border_width_lb);
+	DrawRoundedRect(revealX,(int)((float)WIN_H - (revealY + revealH)),revealW,revealH,color_leaderboard,border_radius_lb,color_leaderboard_border, border_width_lb);
+
+	if(game_time>LB_ANIM_PHASE1_DURATION) {
+		char text[32];
+
+		snprintf(text, sizeof(text), "Leaderboard");
+		DrawText(text, coord_lb[0]+dim_lb[0]/2.0f-150.0f,coord_lb[1]+70.0f,1.0f, text_color,text_border_color,text_border_width);
+
+		DrawLine(coord_lb[0]+4.0f,coord_lb[1]+95.0f,coord_lb[0]+dim_lb[0]-4.0f, coord_lb[1]+95.0f,line_width,color_line);
+
+		float text_scale = 1.0f;
+		float offset = 0.0f;
+
+		for(int i=0;i<n_records;i++) {
+			snprintf(text, sizeof(text), "%d)        %d", i+1, records[i]);
+			DrawText(text, (coord_lb[0]+130.0f+offset),(coord_lb[1]+150.0f+(float)(i*50)), text_scale, text_color, text_border_color, text_border_width);
+			text_scale = 0.7f;
+			offset = 50.0f;
 		}
-		else {
-			DrawLine(coord_lb[0]+4.0f,coord_lb[1]+lineH,coord_lb[0]+dim_lb[0]-4.0f, coord_lb[1]+lineH,line_width,color_line);
+		float lineH;
+		for(int i=0;i<n_records;i++) {
+			lineH = 95.0f + (float)(i)*49.0f + 73.0f;
+			if (i<n_records-1) {
+				DrawLine(coord_lb[0]+4.0f,coord_lb[1]+lineH,coord_lb[0]+dim_lb[0]-4.0f, coord_lb[1]+lineH,line_width,color_line2);
+			}
+			else {
+				DrawLine(coord_lb[0]+4.0f,coord_lb[1]+lineH,coord_lb[0]+dim_lb[0]-4.0f, coord_lb[1]+lineH,line_width,color_line);
+			}
 		}
 	}
+
+    glDisable(GL_SCISSOR_TEST);
 }
 
 
 void state_gameover_init(void) {
-	char sprite_Path[512];
-	GetResourcePath("assets/pixelart_skull.png", sprite_Path, sizeof(sprite_Path));
-	skull = LoadTexture(sprite_Path);
 
 	count_history_load = History_LoadAll(history, (size_t)max_history_load);
 	n_records = top_five_scores(history, (int)count_history_load, records);
@@ -80,6 +109,7 @@ void state_gameover_init(void) {
 	border_radius_lb = 10.0f;
 	border_width_lb = 5.0f;
 	line_width = 5.0f;
+	lb_anim_time = 0.0f;
 
 
 	fill_color(text_color, 255.0f, 148.0f, 0.1f, 1.0f);
@@ -91,17 +121,20 @@ void state_gameover_init(void) {
 void state_gameover_enter(void) {
 	count_history_load = History_LoadAll(history, (size_t)max_history_load);
 	n_records = top_five_scores(history, (int)count_history_load, records);
+
+	lb_anim_time = 0.0f;
 }
 
 void state_gameover_update(double dt) {
-	dt=dt;
+	game_time+=dt;
+	lb_anim_time += (float)dt;
+
+	state_play_update(dt);
 }
 
 void state_gameover_run(void) {
 
 	state_play_run();
-
-	DrawSprite(skull, 0, 0, WIN_W, WIN_H);
 
 	draw_leaderboard();
 }
