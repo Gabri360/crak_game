@@ -72,6 +72,10 @@ static vec4 text_color;
 static vec4 text_border_color;
 static float text_border_widht;
 
+#define NOISE_FR 3
+static float noise_freq[2][3][3][NOISE_FR];
+static float noise_phase[2][3][3][NOISE_FR];
+static const float noise_octave_amp[NOISE_FR] = {1.0f, 0.5f, 0.25f};
 static float noise_gap[2][3][3];
 
 #define max_history_load 3000
@@ -80,7 +84,19 @@ static size_t count_history_load;
 static int record;
 
 
-
+static void init_noise_params(void) {
+    for (int k = 0; k < 2; k++) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                for (int o = 0; o < NOISE_FR; o++) {
+                    float randFreq = 0.15f + ((float)rand() / (float)RAND_MAX) * 0.4f;
+                    noise_freq[k][i][j][o] = randFreq * (float)(o + 1) * 1.7f;
+                    noise_phase[k][i][j][o] = ((float)rand() / (float)RAND_MAX) * 6.2831853f;
+                }
+            }
+        }
+    }
+}
 
 static void draw_time_load_bar(void)
 {
@@ -88,16 +104,26 @@ static void draw_time_load_bar(void)
 	DrawLine((float)(WIN_W-165),60.0f,(float)(WIN_W-165) + (float)game_time*time_load_lenght/20.0f, 60.0f, 10.0f,timer_load_color);
 }
 
-static void update_noise_gap(void)
-{
-	float noise_increase = -2.1f*expf(-0.0076f*(float)score)+3.0f;
-	for(int k=0;k<2;k++) {
-		for(int i=0;i<3;i++) {
-			for(int j=0;j<3;j++) {
-				noise_gap[k][i][j] = 1.5f*(cosf(0.2f*(noise_increase)*(float)time_in_state*(1.0f + (float)(10*i)+(float)(20*j) + (float)(15*k)))+1.0f);
-			}
-		}
-	}
+static void update_noise_gap(void) {
+    float freqScale = (-2.1f * expf(-0.0076f * (float)score) + 3.0f)*3.0f;
+
+    for (int k = 0; k < 2; k++) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                float value = 0.0f;
+                float ampSum = 0.0f;
+
+                for (int o = 0; o < NOISE_FR; o++) {
+                    float phase = noise_freq[k][i][j][o] * freqScale * (float)time_in_state + noise_phase[k][i][j][o];
+                    value += noise_octave_amp[o] * cosf(phase);
+                    ampSum += noise_octave_amp[o];
+                }
+
+                value /= ampSum;
+                noise_gap[k][i][j] = 2.0f * (value + 1.0f);
+            }
+        }
+    }
 }
 
 
@@ -342,6 +368,8 @@ void state_play_init(void) {
 	rect_h = (float)WIN_H/3.0f;
 	fill_color(border_color, 255.0f, 255.0f, 255.0f, 1.0f);
 	border_widht = 3.0f;
+
+	init_noise_params();
 }
 
 
@@ -369,12 +397,12 @@ void state_play_update(double dt) {
     }
 	else {time_stop += dt;}
 
-	if (game_time>=max_time) {
+	if (game_time>=max_time && isAlive) {
 		if (score != 0)
 			History_AddScore(score, game_time);
 		GameState newstate = STATE_GAMEOVER;
-		Game_SetState(newstate);
 		isAlive = 0;
+		Game_SetState(newstate);
 	}
 
 
@@ -410,7 +438,11 @@ void state_play_run(void) {
 	else {
 		currentSprite = idle_choose();
 	}
-	DrawSprite(currentSprite, playerX-20, (float)(WIN_H * 5 / 6 - 143), 140.0f, 140.0f);
+	if (isAlive)
+		DrawSprite(currentSprite, playerX-20, (float)(WIN_H * 5 / 6 - 143), 140.0f, 140.0f);
+	else {
+		DrawSprite(currentSprite, playerX-20 + noise_gap[0][2][player_pos], (float)(WIN_H * 5 / 6 - 143) + noise_gap[1][2][player_pos], 140.0f, 140.0f);
+	}
 
 	draw_record_line();
 

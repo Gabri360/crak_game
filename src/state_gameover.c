@@ -90,6 +90,8 @@ static void draw_leaderboard() {
 				DrawLine(coord_lb[0]+4.0f,coord_lb[1]+lineH,coord_lb[0]+dim_lb[0]-4.0f, coord_lb[1]+lineH,line_width,color_line);
 			}
 		}
+		DrawLine(coord_lb[0]+245.0f,coord_lb[1]+95.0f,coord_lb[0]+245.0f, coord_lb[1]+lineH,line_width,color_line2);
+		DrawLine(coord_lb[0]+245.0f + 100.0f,coord_lb[1]+95.0f,coord_lb[0]+245.0f + 100.0f, coord_lb[1]+lineH,line_width,color_line2);
 	}
 
     glDisable(GL_SCISSOR_TEST);
@@ -101,10 +103,17 @@ void state_gameover_init(void) {
 	count_history_load = History_LoadAll(history, (size_t)max_history_load);
 	n_records = top_five_scores(history, (int)count_history_load, records);
 
-	fill_color(color_leaderboard_border, 255.0f, 148.0f, 0.1f, 1.0f);
-	fill_color(color_leaderboard, 255.0f, 148.0f, 0.1f, 0.4f);
-	fill_color(color_line, 255.0f, 148.0f, 0.1f, 1.0f);
-	fill_color(color_line2, 255.0f, 148.0f, 0.1f, 0.42f);
+	/* fill_color(color_leaderboard_border, 255.0f, 148.0f, 0.1f, 1.0f); */
+	/* fill_color(color_leaderboard, 255.0f, 148.0f, 0.1f, 0.4f); */
+	/* fill_color(color_line, 255.0f, 148.0f, 0.1f, 1.0f); */
+	/* fill_color(color_line2, 255.0f, 148.0f, 0.1f, 0.42f); */
+
+	fill_color(color_leaderboard_border, 20.0f, 20.0f, 20.0f, 1.0f);
+	fill_color(color_leaderboard, 20.0f, 20.0f, 20.0f, 0.4f);
+	fill_color(color_line, 20.0f, 20.0f, 20.0f, 1.0f);
+	fill_color(color_line2, 20.0f, 20.0f, 20.0f, 0.42f);
+	fill_color(text_border_color, 0.1f, 0.1f, 0.1f, 1.0f);
+	fill_color(text_color, 245.0f, 140.0f, 0.1f, 1.0f);
 
 	border_radius_lb = 10.0f;
 	border_width_lb = 5.0f;
@@ -112,8 +121,8 @@ void state_gameover_init(void) {
 	lb_anim_time = 0.0f;
 
 
-	fill_color(text_color, 255.0f, 148.0f, 0.1f, 1.0f);
-	fill_color(text_border_color, 20.0f, 20.0f, 20.0f, 1.0f);
+	/* fill_color(text_color, 255.0f, 148.0f, 0.1f, 1.0f); */
+	/* fill_color(text_border_color, 20.0f, 20.0f, 20.0f, 1.0f); */
 	text_border_width = 3.5f;
 
 }
@@ -122,6 +131,7 @@ void state_gameover_enter(void) {
 	count_history_load = History_LoadAll(history, (size_t)max_history_load);
 	n_records = top_five_scores(history, (int)count_history_load, records);
 
+	game_time = 0.0f;
 	lb_anim_time = 0.0f;
 }
 

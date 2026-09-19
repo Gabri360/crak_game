@@ -49,13 +49,15 @@ int main(void) {
         double dt = currentTime - lastTime;
         lastTime = currentTime;
 
-		Game_Update(dt);
-		Game_Run();
+
 
 
 
 		glfwPollEvents();
 		Game_handle_events(window);
+
+		Game_Update(dt);
+		Game_Run();
 
         glfwSwapBuffers(window);
 
