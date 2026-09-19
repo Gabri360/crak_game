@@ -25,8 +25,11 @@ static int score;
 
 static double max_time;
 
+static vec4 null_color;
+
 static vec4 plat_color;
 static vec4 plat_border_color;
+static vec4 plat_shadow_color;
 static float border_widht;
 
 //------animation
@@ -110,9 +113,11 @@ static void DrawPlat(void) {
 
 				grid_to_pixel(pos_grid, pos_pixel);
 				if (isMoving == 1) {
+					DrawRoundedRect(pos_pixel[0] + 5.0f,pos_pixel[1]+platX + 5.0f,(float)RECT_W,(float)RECT_H,plat_shadow_color,(float)BORDER_RADIUS, null_color, 0.0f);
 					DrawRoundedRect(pos_pixel[0],pos_pixel[1]+platX,(float)RECT_W,(float)RECT_H,plat_color,(float)BORDER_RADIUS, plat_border_color, border_widht);
 				}
 				else {
+					DrawRoundedRect(pos_pixel[0] + noise_gap[0][i][j] + 5.0f ,pos_pixel[1] + noise_gap[1][i][j] + 5.0f,(float)RECT_W,(float)RECT_H,plat_shadow_color, (float)BORDER_RADIUS, null_color, 0.0f);
 					DrawRoundedRect(pos_pixel[0] + noise_gap[0][i][j],pos_pixel[1] + noise_gap[1][i][j],(float)RECT_W,(float)RECT_H,plat_color,(float)BORDER_RADIUS, plat_border_color, border_widht);
 				}
 			}
@@ -123,10 +128,8 @@ static void DrawPlat(void) {
 
 			grid_to_pixel(pos_grid, pos_pixel);
 			if (isMoving == 1) {
+				DrawRoundedRect(pos_pixel[0] + 5.0f,pos_pixel[1]+platX + 5.0f,(float)RECT_W,(float)RECT_H,plat_shadow_color,(float)BORDER_RADIUS, null_color, 0.0f);
 				DrawRoundedRect(pos_pixel[0],pos_pixel[1]+platX,(float)RECT_W,(float)RECT_H,plat_color,(float)BORDER_RADIUS, plat_border_color, border_widht);
-			}
-			else {
-				DrawRoundedRect(pos_pixel[0],pos_pixel[1],(float)RECT_W,(float)RECT_H,plat_color,(float)BORDER_RADIUS, plat_border_color, border_widht);
 			}
 		}
 	}
@@ -257,6 +260,9 @@ static void updateTimerColor(void) {
 
 static void draw_pause_icon(){
 	if (isPaused && time_post_paused!=0) {
+		DrawRoundedRect(((float)WIN_W/3.0f-rect_w/2.0f)+(float)WIN_W/12.0f+PposX + 5.0f,(float)WIN_H/3.0f + 5.0f,rect_w,rect_h,plat_shadow_color,border_radius_icon, null_color, 0.0f);
+		DrawRoundedRect(((float)WIN_W*2.0f/3.0f-rect_w/2.0f)-(float)WIN_W/12.0f+PposX + 5.0f,(float)WIN_H/3.0f + 5.0f,rect_w,rect_h,plat_shadow_color,border_radius_icon, null_color, 0.0f);
+
 		DrawRoundedRect(((float)WIN_W/3.0f-rect_w/2.0f)+(float)WIN_W/12.0f+PposX,(float)WIN_H/3.0f,rect_w,rect_h,icon_color,border_radius_icon, border_color, border_widht);
 		DrawRoundedRect(((float)WIN_W*2.0f/3.0f-rect_w/2.0f)-(float)WIN_W/12.0f+PposX,(float)WIN_H/3.0f,rect_w,rect_h,icon_color,border_radius_icon, border_color, border_widht);
 	}
@@ -297,6 +303,7 @@ void state_play_init(void) {
 	fill_color(bottColor_start, 155.1f, 30.1f, 155.1f, 1.0f);
 	fill_color(topColor_end, 255.0f, 0.1f, 0.1f, 1.0f);
 	fill_color(bottColor_end, 0.1f, 0.1f, 255.0f, 1.0f);
+	fill_color(null_color, 0.0f, 0.0f, 0.0f, 0.0f);
 
 	//fill_color(timer_load_color_bg, 255.0f, 255.0f, 255.0f, 0.3f);
 	fill_color(timer_load_color_bg, 0.1f, 0.1f, 0.1f, 0.35f);
@@ -312,6 +319,7 @@ void state_play_init(void) {
 
 	fill_color(plat_color, 255.0f, 148.0f, 0.1f, 1.0f);
 	fill_color(plat_border_color, 255.0f, 255.0f, 255.0f, 1.0f);
+	fill_color(plat_shadow_color, 20.0f, 20.0f, 20.0f, 0.3f);
 	border_widht = 3.0f;
 
 	count_history_load = History_LoadAll(history, (size_t)max_history_load);

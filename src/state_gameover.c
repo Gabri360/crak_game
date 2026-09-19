@@ -81,6 +81,7 @@ void state_gameover_init(void) {
 	border_width_lb = 5.0f;
 	line_width = 5.0f;
 
+
 	fill_color(text_color, 255.0f, 148.0f, 0.1f, 1.0f);
 	fill_color(text_border_color, 20.0f, 20.0f, 20.0f, 1.0f);
 	text_border_width = 3.5f;

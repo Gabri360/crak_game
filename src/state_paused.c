@@ -15,6 +15,9 @@ static float rect_w;
 static float rect_h;
 static float border_radius_icon;
 
+static vec4 null_color;
+static vec4 shadow_color;
+
 static vec4 border_color;
 static float border_widht;
 
@@ -30,6 +33,9 @@ void state_paused_init(void) {
 	rect_h = (float)WIN_H/3.0f;
 	fill_color(border_color, 255.0f, 255.0f, 255.0f, 1.0f);
 	border_widht = 3.0f;
+
+	fill_color(shadow_color, 20.0f, 20.0f, 20.0f, 0.3f);
+	fill_color(null_color, 0.0f, 0.0f, 0.0f, 0.0f);
 
 	startX=(float)(-WIN_W*3/5);
 	endX=0.0f;
@@ -55,6 +61,9 @@ void state_paused_update(double dt) {
 void state_paused_run(void) {
 
 	state_play_run();
+	DrawRoundedRect(((float)WIN_W/3.0f-rect_w/2.0f)+(float)WIN_W/12.0f+posX + 5.0f,(float)WIN_H/3.0f + 5.0f,rect_w,rect_h,shadow_color,border_radius_icon, null_color, 0.0f);
+	DrawRoundedRect(((float)WIN_W*2.0f/3.0f-rect_w/2.0f)-(float)WIN_W/12.0f+posX + 5.0f,(float)WIN_H/3.0f + 5.0f,rect_w,rect_h,shadow_color,border_radius_icon, null_color, 0.0f);
+
 	DrawRoundedRect(((float)WIN_W/3.0f-rect_w/2.0f)+(float)WIN_W/12.0f+posX,(float)WIN_H/3.0f,rect_w,rect_h,icon_color,border_radius_icon, border_color, border_widht);
 	DrawRoundedRect(((float)WIN_W*2.0f/3.0f-rect_w/2.0f)-(float)WIN_W/12.0f+posX,(float)WIN_H/3.0f,rect_w,rect_h,icon_color,border_radius_icon, border_color, border_widht);
 
