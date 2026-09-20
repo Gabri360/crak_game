@@ -371,6 +371,7 @@ void state_play_init(void) {
 	PposX = 0.0f;
 	isAlive = 1;
 
+	update_background_colors();
 
 	count_history_load = History_LoadAll(history, (size_t)max_history_load);
 	record = max_score(history, (int)count_history_load);
@@ -487,6 +488,10 @@ void state_play_handle_events(GLFWwindow* window) {
         is_moving_right = 0;
         update_after_press();
     }
+	if (Input_KeyPressed(window, GLFW_KEY_S)) {
+		GameState newstate = STATE_STATISTICS;
+		Game_SetState(newstate);
+	}
 }
 
 void state_play_esc(void) {
