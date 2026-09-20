@@ -30,7 +30,7 @@ static float text_border_width;
 static float lb_anim_time;
 static double game_time;
 
-static void draw_leaderboard() {
+static void draw_leaderboard(void) {
 
 	float coord_lb[2] = {(float)(WIN_W/6), (float)(WIN_H/6)};
 	float dim_lb[2] = {(float)WIN_W-2.0f*coord_lb[0], (float)WIN_H-2.0f*coord_lb[1]};
@@ -98,7 +98,7 @@ static void draw_leaderboard() {
 }
 
 void gameover_load(void) {
-		/* fill_color(color_leaderboard_border, 255.0f, 148.0f, 0.1f, 1.0f); */
+	/* fill_color(color_leaderboard_border, 255.0f, 148.0f, 0.1f, 1.0f); */
 	/* fill_color(color_leaderboard, 255.0f, 148.0f, 0.1f, 0.4f); */
 	/* fill_color(color_line, 255.0f, 148.0f, 0.1f, 1.0f); */
 	/* fill_color(color_line2, 255.0f, 148.0f, 0.1f, 0.42f); */

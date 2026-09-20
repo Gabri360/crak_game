@@ -41,6 +41,7 @@ static float targetX;
 static float moveElapsed;
 static int isMoving;
 static int isPaused;
+static int isStatistic;
 static double time_post_paused;
 static float platX;
 
@@ -359,6 +360,7 @@ void state_play_init(void) {
     targetX = playerX;
     isMoving = 0;
 	isPaused = 0;
+	isStatistic = 0;
 	time_post_paused = 0.0;
 	platX = 0;
 	score = 0;
@@ -386,6 +388,7 @@ void state_play_enter(void) {
 	PendX = (float)(WIN_W*3/5);
 	time_post_paused = 0;
 	isAlive = 1;
+	isStatistic = 0;
 }
 
 void state_play_update(double dt) {
@@ -412,7 +415,7 @@ void state_play_update(double dt) {
 	}
 
 
-	if (score != 0 && isAlive) {
+	if (score != 0 && isAlive && isStatistic == 0) {
 		game_time += dt;
 	}
 	time_in_state += dt;
@@ -488,9 +491,10 @@ void state_play_handle_events(GLFWwindow* window) {
         is_moving_right = 0;
         update_after_press();
     }
-	if (Input_KeyPressed(window, GLFW_KEY_S)) {
+	if (Input_KeyPressed(window, GLFW_KEY_S) && score == 0) {
 		GameState newstate = STATE_STATISTICS;
 		Game_SetState(newstate);
+		isStatistic = 1;
 	}
 }
 

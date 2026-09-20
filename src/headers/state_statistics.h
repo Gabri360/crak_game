@@ -2,6 +2,8 @@
 #define STATE_STATISTICS_H
 
 
+
+void statistics_load(void);
 void statistics_init(void);
 void statistics_enter(void);
 void statistics_update(double dt);

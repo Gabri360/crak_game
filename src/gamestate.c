@@ -13,6 +13,7 @@ void Game_load(void) {
 	play_load_texture_and_constant();
 	gameover_load();
 	paused_load();
+	statistics_load();
 }
 
 void Game_Init(void) {
