@@ -4,7 +4,8 @@
 typedef enum {
     STATE_PLAY,
     STATE_PAUSED,
-    STATE_GAMEOVER
+    STATE_GAMEOVER,
+	STATE_STATISTICS
 } GameState;
 
 

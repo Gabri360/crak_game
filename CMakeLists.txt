@@ -52,6 +52,7 @@ set(GAME_SOURCES
   src/state_paused.c
   src/game_fun.c
   src/state_gameover.c
+  src/state_statistics.c
 )
 
 set(VENDOR_SOURCES

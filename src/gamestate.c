@@ -4,6 +4,7 @@
 #include "state_play.h"
 #include "state_paused.h"
 #include "state_gameover.h"
+#include "state_statistics.h"
 
 GameState currentState = STATE_PLAY;
 
@@ -18,6 +19,7 @@ void Game_Init(void) {
     state_play_init();
     state_paused_init();
     state_gameover_init();
+	statistics_init();
 }
 
 void Game_state_enter(void) {
@@ -31,6 +33,9 @@ void Game_state_enter(void) {
     case STATE_GAMEOVER:
 		state_gameover_enter();
         break;
+	case STATE_STATISTICS:
+		statistics_enter();
+		break;
     }
 }
 
@@ -45,6 +50,8 @@ void Game_Update(double dt) {
     case STATE_GAMEOVER:
 		state_gameover_update(dt);
         break;
+	case STATE_STATISTICS:
+		statistics_update(dt);
     }
 }
 
@@ -59,6 +66,9 @@ void Game_Run(void) {
     case STATE_GAMEOVER:
 		state_gameover_run();
         break;
+	case STATE_STATISTICS:
+		statistics_run();
+		break;
     }
 }
 
@@ -73,6 +83,9 @@ void Game_handle_events(GLFWwindow* window) {
     case STATE_GAMEOVER:
 		state_gameover_handle_events(window);
         break;
+	case STATE_STATISTICS:
+		statistics_handle_events(window);
+		break;
     }
 }
 
@@ -87,6 +100,9 @@ void Game_state_esc(void) {
     case STATE_GAMEOVER:
 		state_gameover_esc();
         break;
+	case STATE_STATISTICS:
+		statistics_esc();
+		break;
     }
 }
 
@@ -94,6 +110,7 @@ void Game_Shutdown(void) {
     state_play_shutdown();
 	state_paused_shutdown();
 	state_gameover_shutdown();
+	statistics_shutdown();
 }
 
 
