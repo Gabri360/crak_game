@@ -97,13 +97,8 @@ static void draw_leaderboard() {
     glDisable(GL_SCISSOR_TEST);
 }
 
-
-void state_gameover_init(void) {
-
-	count_history_load = History_LoadAll(history, (size_t)max_history_load);
-	n_records = top_five_scores(history, (int)count_history_load, records);
-
-	/* fill_color(color_leaderboard_border, 255.0f, 148.0f, 0.1f, 1.0f); */
+void gameover_load(void) {
+		/* fill_color(color_leaderboard_border, 255.0f, 148.0f, 0.1f, 1.0f); */
 	/* fill_color(color_leaderboard, 255.0f, 148.0f, 0.1f, 0.4f); */
 	/* fill_color(color_line, 255.0f, 148.0f, 0.1f, 1.0f); */
 	/* fill_color(color_line2, 255.0f, 148.0f, 0.1f, 0.42f); */
@@ -124,7 +119,12 @@ void state_gameover_init(void) {
 	/* fill_color(text_color, 255.0f, 148.0f, 0.1f, 1.0f); */
 	/* fill_color(text_border_color, 20.0f, 20.0f, 20.0f, 1.0f); */
 	text_border_width = 3.5f;
+}
 
+void state_gameover_init(void) {
+
+	count_history_load = History_LoadAll(history, (size_t)max_history_load);
+	n_records = top_five_scores(history, (int)count_history_load, records);
 }
 
 void state_gameover_enter(void) {
@@ -145,7 +145,6 @@ void state_gameover_update(double dt) {
 void state_gameover_run(void) {
 
 	state_play_run();
-
 	draw_leaderboard();
 }
 

@@ -185,7 +185,7 @@ int top_five_scores(ScoreEntry history[], int max_count, int result[])
 
 void SetWindowIcon(GLFWwindow *window)
 {
-    char icon_path[64];
+    char icon_path[512];
 
     GetResourcePath("assets/idle/idle_right1.png", icon_path, sizeof(icon_path));
 

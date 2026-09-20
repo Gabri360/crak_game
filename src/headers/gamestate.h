@@ -7,6 +7,8 @@ typedef enum {
     STATE_GAMEOVER
 } GameState;
 
+
+void Game_load(void);
 void Game_Init(void);
 void Game_state_enter(void);
 void Game_Update(double dt);

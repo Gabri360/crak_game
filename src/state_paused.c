@@ -19,26 +19,31 @@ static vec4 null_color;
 static vec4 shadow_color;
 
 static vec4 border_color;
-static float border_widht;
+static float border_width;
 
 static float startX;
 static float endX;
 static float posX;
 static float moveElapsed;
 
-void state_paused_init(void) {
+
+void paused_load(void) {
 	fill_color(icon_color, 255.0f, 148.0f, 0.1f, 1.0f);
 	border_radius_icon = 20.0f;
 	rect_w = (float)WIN_W/18.0f;
 	rect_h = (float)WIN_H/3.0f;
 	fill_color(border_color, 255.0f, 255.0f, 255.0f, 1.0f);
-	border_widht = 3.0f;
+	border_width = 3.0f;
 
 	fill_color(shadow_color, 20.0f, 20.0f, 20.0f, 0.3f);
 	fill_color(null_color, 0.0f, 0.0f, 0.0f, 0.0f);
 
 	startX=(float)(-WIN_W*3/5);
 	endX=0.0f;
+}
+
+void state_paused_init(void) {
+
 
 }
 
@@ -64,8 +69,8 @@ void state_paused_run(void) {
 	DrawRoundedRect(((float)WIN_W/3.0f-rect_w/2.0f)+(float)WIN_W/12.0f+posX + 5.0f,(float)WIN_H/3.0f + 5.0f,rect_w,rect_h,shadow_color,border_radius_icon, null_color, 0.0f);
 	DrawRoundedRect(((float)WIN_W*2.0f/3.0f-rect_w/2.0f)-(float)WIN_W/12.0f+posX + 5.0f,(float)WIN_H/3.0f + 5.0f,rect_w,rect_h,shadow_color,border_radius_icon, null_color, 0.0f);
 
-	DrawRoundedRect(((float)WIN_W/3.0f-rect_w/2.0f)+(float)WIN_W/12.0f+posX,(float)WIN_H/3.0f,rect_w,rect_h,icon_color,border_radius_icon, border_color, border_widht);
-	DrawRoundedRect(((float)WIN_W*2.0f/3.0f-rect_w/2.0f)-(float)WIN_W/12.0f+posX,(float)WIN_H/3.0f,rect_w,rect_h,icon_color,border_radius_icon, border_color, border_widht);
+	DrawRoundedRect(((float)WIN_W/3.0f-rect_w/2.0f)+(float)WIN_W/12.0f+posX,(float)WIN_H/3.0f,rect_w,rect_h,icon_color,border_radius_icon, border_color, border_width);
+	DrawRoundedRect(((float)WIN_W*2.0f/3.0f-rect_w/2.0f)-(float)WIN_W/12.0f+posX,(float)WIN_H/3.0f,rect_w,rect_h,icon_color,border_radius_icon, border_color, border_width);
 
 }
 

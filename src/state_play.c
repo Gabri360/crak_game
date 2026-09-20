@@ -33,7 +33,6 @@ static vec4 null_color;
 static vec4 plat_color;
 static vec4 plat_border_color;
 static vec4 plat_shadow_color;
-static float border_widht;
 
 //------animation
 static float playerX;
@@ -53,7 +52,7 @@ static float rect_w;
 static float rect_h;
 static float border_radius_icon;
 static vec4 border_color;
-static float border_widht;
+static float border_width;
 
 
 static vec4 color_dash_line;
@@ -70,7 +69,7 @@ static float time_load_lenght;
 
 static vec4 text_color;
 static vec4 text_border_color;
-static float text_border_widht;
+static float text_border_width;
 
 #define NOISE_FR 3
 static float noise_freq[2][3][3][NOISE_FR];
@@ -143,11 +142,11 @@ static void DrawPlat(void) {
 				grid_to_pixel(pos_grid, pos_pixel);
 				if (isMoving == 1) {
 					DrawRoundedRect(pos_pixel[0] + 5.0f,pos_pixel[1]+platX + 5.0f,(float)RECT_W,(float)RECT_H,plat_shadow_color,(float)BORDER_RADIUS, null_color, 0.0f);
-					DrawRoundedRect(pos_pixel[0],pos_pixel[1]+platX,(float)RECT_W,(float)RECT_H,plat_color,(float)BORDER_RADIUS, plat_border_color, border_widht);
+					DrawRoundedRect(pos_pixel[0],pos_pixel[1]+platX,(float)RECT_W,(float)RECT_H,plat_color,(float)BORDER_RADIUS, plat_border_color, border_width);
 				}
 				else {
 					DrawRoundedRect(pos_pixel[0] + noise_gap[0][i][j] + 5.0f ,pos_pixel[1] + noise_gap[1][i][j] + 5.0f,(float)RECT_W,(float)RECT_H,plat_shadow_color, (float)BORDER_RADIUS, null_color, 0.0f);
-					DrawRoundedRect(pos_pixel[0] + noise_gap[0][i][j],pos_pixel[1] + noise_gap[1][i][j],(float)RECT_W,(float)RECT_H,plat_color,(float)BORDER_RADIUS, plat_border_color, border_widht);
+					DrawRoundedRect(pos_pixel[0] + noise_gap[0][i][j],pos_pixel[1] + noise_gap[1][i][j],(float)RECT_W,(float)RECT_H,plat_color,(float)BORDER_RADIUS, plat_border_color, border_width);
 				}
 			}
 		}
@@ -158,7 +157,7 @@ static void DrawPlat(void) {
 			grid_to_pixel(pos_grid, pos_pixel);
 			if (isMoving == 1) {
 				DrawRoundedRect(pos_pixel[0] + 5.0f,pos_pixel[1]+platX + 5.0f,(float)RECT_W,(float)RECT_H,plat_shadow_color,(float)BORDER_RADIUS, null_color, 0.0f);
-				DrawRoundedRect(pos_pixel[0],pos_pixel[1]+platX,(float)RECT_W,(float)RECT_H,plat_color,(float)BORDER_RADIUS, plat_border_color, border_widht);
+				DrawRoundedRect(pos_pixel[0],pos_pixel[1]+platX,(float)RECT_W,(float)RECT_H,plat_color,(float)BORDER_RADIUS, plat_border_color, border_width);
 			}
 		}
 	}
@@ -184,7 +183,7 @@ static int check_death(void)
 	else {return 0;}
 }
 
-static void update_background_colors(int score, vec4 topColor, vec4 bottColor)
+static void update_background_colors(void)
 {
     float t = (float)score / ((float)max_time*4.5f);
 
@@ -196,7 +195,7 @@ static void update_background_colors(int score, vec4 topColor, vec4 bottColor)
     }
 }
 
-static void update_after_press()
+static void update_after_press(void)
 {
 	targetX = PlayerGridToPixelX(player_pos);
     moveElapsed = 0.0f;
@@ -209,19 +208,19 @@ static void update_after_press()
 		Game_SetState(newstate);
 		isAlive = 0;
 	}
-	else {score++; update_background_colors(score,topColor,bottColor);}
+	else {score++; update_background_colors();}
 	add_row(new_plat,player_pos);
 }
 
-static void draw_play_text()
+static void draw_play_text(void)
 {
 	char text[32];
 
 	snprintf(text, sizeof(text),"SCORE: %d", score);
-	DrawText(text, 20.0f, 40.0f, 0.7f, text_color, text_border_color, text_border_widht);
+	DrawText(text, 20.0f, 40.0f, 0.7f, text_color, text_border_color, text_border_width);
 
 	snprintf(text, sizeof(text),"TIME: %.1f", game_time);
-	DrawText(text, (float)WIN_W-175.0f, 40.0f, 0.7f, text_color, text_border_color, text_border_widht);
+	DrawText(text, (float)WIN_W-175.0f, 40.0f, 0.7f, text_color, text_border_color, text_border_width);
 
 	if (score < record) {
 		snprintf(text, sizeof(text),"RECORD: %d", record);
@@ -229,11 +228,11 @@ static void draw_play_text()
 	else {
 		snprintf(text, sizeof(text),"RECORD: %d", score);
 	}
-	DrawText(text, 20.0f, 70.0f, 0.4f, text_color, text_border_color, text_border_widht);
+	DrawText(text, 20.0f, 70.0f, 0.4f, text_color, text_border_color, text_border_width);
 
 }
 
-static void draw_record_line() {
+static void draw_record_line(void) {
 	static int temp_score;
 	if (isMoving == 0) {temp_score = score;}
 	float line_pos = (float)(-WIN_H*(record-temp_score)/3 + WIN_H*2/3 + 50);
@@ -245,7 +244,7 @@ static void draw_record_line() {
 	}
 }
 
-static void load_idle() {
+static void load_idle(void) {
 	char sprite_Path[512];
 	char temp_path[32];
 	for (int i=1; i<10;i++) {
@@ -261,7 +260,7 @@ static void load_idle() {
 
 
 
-static GLuint idle_choose() {
+static GLuint idle_choose(void) {
 
 	if (isAlive == 0) {return is_moving_right ? skull_right : skull_left;}
 
@@ -290,17 +289,17 @@ static void updateTimerColor(void) {
     timer_load_color[1] = Lerp(1.0f, 0.0f, t);
 }
 
-static void draw_pause_icon(){
+static void draw_pause_icon(void){
 	if (isPaused && time_post_paused!=0) {
 		DrawRoundedRect(((float)WIN_W/3.0f-rect_w/2.0f)+(float)WIN_W/12.0f+PposX + 5.0f,(float)WIN_H/3.0f + 5.0f,rect_w,rect_h,plat_shadow_color,border_radius_icon, null_color, 0.0f);
 		DrawRoundedRect(((float)WIN_W*2.0f/3.0f-rect_w/2.0f)-(float)WIN_W/12.0f+PposX + 5.0f,(float)WIN_H/3.0f + 5.0f,rect_w,rect_h,plat_shadow_color,border_radius_icon, null_color, 0.0f);
 
-		DrawRoundedRect(((float)WIN_W/3.0f-rect_w/2.0f)+(float)WIN_W/12.0f+PposX,(float)WIN_H/3.0f,rect_w,rect_h,icon_color,border_radius_icon, border_color, border_widht);
-		DrawRoundedRect(((float)WIN_W*2.0f/3.0f-rect_w/2.0f)-(float)WIN_W/12.0f+PposX,(float)WIN_H/3.0f,rect_w,rect_h,icon_color,border_radius_icon, border_color, border_widht);
+		DrawRoundedRect(((float)WIN_W/3.0f-rect_w/2.0f)+(float)WIN_W/12.0f+PposX,(float)WIN_H/3.0f,rect_w,rect_h,icon_color,border_radius_icon, border_color, border_width);
+		DrawRoundedRect(((float)WIN_W*2.0f/3.0f-rect_w/2.0f)-(float)WIN_W/12.0f+PposX,(float)WIN_H/3.0f,rect_w,rect_h,icon_color,border_radius_icon, border_color, border_width);
 	}
 }
 
-void state_play_init(void) {
+void play_load_texture_and_constant(void) {
     char sprite_Path[512];
 	load_idle();
 	GetResourcePath("assets/jump_right.png", sprite_Path, sizeof(sprite_Path));
@@ -311,6 +310,44 @@ void state_play_init(void) {
     skull_right = LoadTexture(sprite_Path);
 	GetResourcePath("assets/skull_left.png", sprite_Path, sizeof(sprite_Path));
     skull_left = LoadTexture(sprite_Path);
+
+	fill_color(color_dash_line, 255.0f, 0.1f, 0.1f, 0.5f);
+	fill_color(topColor_start, 0.1f, 255.0f, 0.1f, 1.0f);
+	fill_color(bottColor_start, 155.1f, 30.1f, 155.1f, 1.0f);
+	fill_color(topColor_end, 255.0f, 0.1f, 0.1f, 1.0f);
+	fill_color(bottColor_end, 0.1f, 0.1f, 255.0f, 1.0f);
+	fill_color(null_color, 0.0f, 0.0f, 0.0f, 0.0f);
+
+	//fill_color(timer_load_color_bg, 255.0f, 255.0f, 255.0f, 0.3f);
+	fill_color(timer_load_color_bg, 0.1f, 0.1f, 0.1f, 0.35f);
+	fill_color(timer_load_color, 255.0f, 255.0f, 20.0f, 1.0f);
+	time_load_lenght = 147.0f;
+
+	color_copy(topColor,topColor_start);
+	color_copy(bottColor,bottColor_start);
+
+	fill_color(text_color, 255.0f, 255.0f, 255.0f, 1.0f);
+	fill_color(text_border_color, 0.1f, 0.1f, 0.1f, 1.0f);
+	text_border_width = 3.5f;
+
+	fill_color(plat_color, 255.0f, 148.0f, 0.1f, 1.0f);
+	fill_color(plat_border_color, 255.0f, 255.0f, 255.0f, 1.0f);
+	fill_color(plat_shadow_color, 20.0f, 20.0f, 20.0f, 0.3f);
+	border_width = 3.0f;
+
+
+	fill_color(icon_color, 255.0f, 148.0f, 0.1f, 1.0f);
+	border_radius_icon = 20.0f;
+	rect_w = (float)WIN_W/18.0f;
+	rect_h = (float)WIN_H/3.0f;
+	fill_color(border_color, 255.0f, 255.0f, 255.0f, 1.0f);
+	border_width = 3.0f;
+
+	init_noise_params();
+}
+
+
+void state_play_init(void) {
 
 	player_pos = 1;
 	is_moving_right = 1;
@@ -335,47 +372,15 @@ void state_play_init(void) {
 	isAlive = 1;
 
 
-	fill_color(color_dash_line, 255.0f, 0.1f, 0.1f, 0.5f);
-	fill_color(topColor_start, 0.1f, 255.0f, 0.1f, 1.0f);
-	fill_color(bottColor_start, 155.1f, 30.1f, 155.1f, 1.0f);
-	fill_color(topColor_end, 255.0f, 0.1f, 0.1f, 1.0f);
-	fill_color(bottColor_end, 0.1f, 0.1f, 255.0f, 1.0f);
-	fill_color(null_color, 0.0f, 0.0f, 0.0f, 0.0f);
-
-	//fill_color(timer_load_color_bg, 255.0f, 255.0f, 255.0f, 0.3f);
-	fill_color(timer_load_color_bg, 0.1f, 0.1f, 0.1f, 0.35f);
-	fill_color(timer_load_color, 255.0f, 255.0f, 20.0f, 1.0f);
-	time_load_lenght = 147.0f;
-
-	color_copy(topColor,topColor_start);
-	color_copy(bottColor,bottColor_start);
-
-	fill_color(text_color, 255.0f, 255.0f, 255.0f, 1.0f);
-	fill_color(text_border_color, 0.1f, 0.1f, 0.1f, 1.0f);
-	text_border_widht = 3.5f;
-
-	fill_color(plat_color, 255.0f, 148.0f, 0.1f, 1.0f);
-	fill_color(plat_border_color, 255.0f, 255.0f, 255.0f, 1.0f);
-	fill_color(plat_shadow_color, 20.0f, 20.0f, 20.0f, 0.3f);
-	border_widht = 3.0f;
-
 	count_history_load = History_LoadAll(history, (size_t)max_history_load);
 	record = max_score(history, (int)count_history_load);
-
-	fill_color(icon_color, 255.0f, 148.0f, 0.1f, 1.0f);
-	border_radius_icon = 20.0f;
-	rect_w = (float)WIN_W/18.0f;
-	rect_h = (float)WIN_H/3.0f;
-	fill_color(border_color, 255.0f, 255.0f, 255.0f, 1.0f);
-	border_widht = 3.0f;
-
-	init_noise_params();
 }
 
 
 
 
 void state_play_enter(void) {
+
 	PstartX = 0.0f;
 	PendX = (float)(WIN_W*3/5);
 	time_post_paused = 0;

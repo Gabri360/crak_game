@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <stdlib.h>
+#define _POSIX_C_SOURCE 199309L
 #include <time.h>
 #include "renderer.h"
 #include "gamestate.h"
@@ -41,6 +42,7 @@ int main(void) {
 
 	double lastTime = glfwGetTime();
 	srand((unsigned int)time(NULL));
+	Game_load();
 	Game_Init();
 	//------------------------------------------- MAIN LOOP
     while (!glfwWindowShouldClose(window)) {

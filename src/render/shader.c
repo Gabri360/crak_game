@@ -38,6 +38,13 @@ GLuint LoadShaderProgram(const char* vertPath, const char* fragPath) {
     char* vertSrc = ReadFile(vertPath);
     char* fragSrc = ReadFile(fragPath);
 
+	if (!vertSrc || !fragSrc) {
+        fprintf(stderr, "[Error] load shader: %s / %s\n", vertPath, fragPath);
+        free(vertSrc);
+        free(fragSrc);
+        return 0;
+    }
+
     GLuint vert = CompileShader(GL_VERTEX_SHADER, vertSrc);
     GLuint frag = CompileShader(GL_FRAGMENT_SHADER, fragSrc);
 

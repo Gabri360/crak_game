@@ -2,6 +2,7 @@
 #define STATE_PAUSED_H
 
 
+void paused_load(void);
 void state_paused_init(void);
 void state_paused_enter(void);
 void state_paused_update(double dt);

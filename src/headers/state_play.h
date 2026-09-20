@@ -2,6 +2,8 @@
 #define STATE_PLAY_H
 
 
+
+void play_load_texture_and_constant(void);
 void state_play_init(void);
 void state_play_enter(void);
 void state_play_update(double dt);

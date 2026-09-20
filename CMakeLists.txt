@@ -86,7 +86,10 @@ set_source_files_properties(
   src/state_gameover.c
   src/render/shader.c
   src/render/renderer.c
-  src/render/input.c
+  src/render/text_renderer.c
+  src/utils/input.c
+  src/utils/paths.c
+  src/utils/history.c
   src/game_fun.c
   PROPERTIES COMPILE_OPTIONS "-Wall;-Wextra;-Wpedantic;-Werror;-Wconversion"
 )
