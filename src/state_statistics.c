@@ -9,7 +9,6 @@
 #include "game_fun.h"
 #include "config.h"
 #include "history.h"
-#include <stdio.h>
 
 
 static float frame_anim_time;
@@ -18,6 +17,8 @@ static vec4 color_frame_border;
 static float border_radius_frame;
 static float border_width_frame;
 
+static vec4 black;
+static vec4 blank;
 static vec4 null_color;
 static double game_time;
 static float coord_frame[2];
@@ -32,6 +33,7 @@ static vec4 text_border_color;
 static float text_border_width;
 static vec4 color_histo_data;
 static vec4 color_histo_data_border;
+static vec4 color_leg;
 
 #define max_history_load 9000
 static ScoreEntry history[max_history_load];
@@ -39,6 +41,12 @@ static size_t count_history_load;
 
 static int histogram_time_data[20];
 static int max_time_data;
+
+static float mean;
+static float stdev;
+static float leg_padding;
+static float dim_leg[2];
+static float pos_leg[2];
 
 static void draw_frame(void) {
 
@@ -90,17 +98,43 @@ static void load_histogram_time(void) {
 	}
 }
 
+static void analisis(void) {
+	mean = 0.0f;
+	stdev = 0.0f;
+	for(int i=0;i<(int)count_history_load;i++) {
+		mean += (float)history[i].game_time;
+	}
+	mean /= (float)count_history_load;
+
+	for(int j=0;j<(int)count_history_load;j++) {
+		stdev += ((float)history[j].game_time - mean) * ((float)history[j].game_time - mean);
+	}
+	stdev = sqrtf(stdev/(float)count_history_load);
+}
+
 static void draw_time_data(void) {
 
 	float padding = 60.0f;
+	char text[32];
 	float pos_tar;
 	float spacing = (dim_graph[0] - 2.0f*padding) / 21.0f;
 	float unitH = (dim_graph[1]- 20.0f - 2.0f*padding)/(float)max_time_data;
 	for(int i=0;i<20;i++) {
 		pos_tar = (float)i*spacing;
 		DrawRoundedRect(coord_graph[0] + padding + pos_tar + 5.0f, coord_graph[1] + dim_graph[1] - padding-(float)histogram_time_data[i]*unitH, spacing, (float)histogram_time_data[i]*unitH, color_histo_data, 2.0f, color_histo_data_border, 2.0f);
+
+		if (histogram_time_data[i] != 0) {
+		snprintf(text, sizeof(text), "%d", histogram_time_data[i]);
+		DrawText(text, coord_graph[0] + padding + pos_tar + 10.0f, coord_graph[1] + dim_graph[1] - padding-(float)histogram_time_data[i]*unitH - 5.0f, 0.3f, blank,color_histo_data, text_border_width);
+		}
 	}
 
+	DrawRoundedRect(pos_leg[0], pos_leg[1], dim_leg[0], dim_leg[1], color_leg, 5.0f, color_graf_border, 2.0f);
+
+	snprintf(text, sizeof(text), "Mean  =  %.2f", mean);
+	DrawText(text, pos_leg[0] + 20.0f, pos_leg[1] + 30.0f, 0.3f, blank, black, 2.0f);
+	snprintf(text, sizeof(text), "Stderr =  %.2f", stdev);
+	DrawText(text, pos_leg[0] + 20.0f, pos_leg[1] + 60.0f, 0.3f, blank, black, 2.0f);
 }
 
 static void draw_axis_time(void) {
@@ -121,6 +155,9 @@ static void draw_axis_time(void) {
 	}
 	snprintf(text, sizeof(text), "Count");
 	DrawText(text, coord_graph[0] + 35.0f, coord_graph[1] + padding - 20.0f, 0.3f, text_color, text_border_color, text_border_width);
+
+	snprintf(text, sizeof(text), "Time");
+	DrawText(text,coord_graph[0] + dim_graph[0] - padding + 5.0f , coord_graph[1] + dim_graph[1] - padding + 25.0f, 0.3f, text_color, text_border_color, text_border_width);
 }
 
 
@@ -140,6 +177,9 @@ void statistics_load(void) {
 	fill_color(text_color, 245.0f, 140.0f, 0.1f, 1.0f);
 	fill_color(color_histo_data, 0.0f, 0.0f, 255.0f, 1.0f);
 	fill_color(color_histo_data_border, 0.0f, 0.0f, 0.0f,1.0f);
+	fill_color(blank, 255.0f, 255.0f, 255.0f, 1.0f);
+	fill_color(color_leg, 20.0f, 20.0f, 20.0f, 0.9f);
+	fill_color(black, 0.0f, 0.0f, 0.0f, 1.0f);
 
 	text_border_width = 3.5f;
 	border_radius_frame = 10.0f;
@@ -154,9 +194,18 @@ void statistics_load(void) {
 	coord_graph[0] = coord_graph[1] = 73.0f + 50.0f;
 	dim_graph[0] = dim_graph[1] = dim_frame[0]-2.0f*(coord_graph[0]-coord_frame[0]);
 
+
+
+	leg_padding = 20.0f;
+	dim_leg[0] = 150.0f;
+	dim_leg[1] = 80.0f;
+	pos_leg[0] = coord_frame[0] + dim_graph[0] - dim_leg[0] + 50.0f - leg_padding;
+	pos_leg[1] = coord_frame[1] + 50.0f + leg_padding;
+
 	count_history_load = History_LoadAll(history, max_history_load);
 
 	load_histogram_time();
+	analisis();
 }
 
 void statistics_init(void) {
@@ -166,6 +215,10 @@ void statistics_init(void) {
 void statistics_enter(void) {
 	game_time = 0.0f;
 	frame_anim_time = 0.0f;
+
+	count_history_load = History_LoadAll(history, max_history_load);
+	load_histogram_time();
+	analisis();
 }
 
 void statistics_update(double dt) {
