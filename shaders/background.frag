@@ -7,5 +7,5 @@ uniform vec4 uColorTop;
 uniform vec4 uColorBottom;
 
 void main() {
-  FragColor = mix(uColorBottom, uColorTop, vUV.y + sin(vUV.x+ut)*0.1);
+      FragColor = mix(uColorBottom, uColorTop, vUV.y + sin(vUV.x + ut) * 0.1);
 }

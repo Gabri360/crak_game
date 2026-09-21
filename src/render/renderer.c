@@ -21,18 +21,22 @@ static GLint locBGModel, locBGProj, locBGColorTop, locBGColorBottom, locBGt;
 static GLuint lineShaderProgram;
 static GLint locLineModel, locLineProj, locLineColor, locLineOrigin, locLineSize, locLinePointA, locLinePointB, locLineRadius;
 
+#define TRIANGLE_AA_PADDING 2.0f
+static GLuint triangleShaderProgram;
+static GLint locTriModel, locTriProj, locTriColor, locTriOrigin, locTriSize, locTriPointA, locTriPointB, locTriPointC, locTriRadius;
 
 
 static mat4 projection;
 
 void Renderer_Init(int screenWidth, int screenHeight) {
     // --- Shader ---
-	char vertPath[512], fragPath[512], rrFragPath[512], bgFragPath[512], lineFragPath[512];
+	char vertPath[512], fragPath[512], rrFragPath[512], bgFragPath[512], lineFragPath[512], triFragPath[512];
     GetResourcePath("shaders/sprite.vert", vertPath, sizeof(vertPath));
     GetResourcePath("shaders/sprite.frag", fragPath, sizeof(fragPath));
 	GetResourcePath("shaders/rounded_rect.frag", rrFragPath, sizeof(rrFragPath));
 	GetResourcePath("shaders/background.frag", bgFragPath, sizeof(bgFragPath));
 	GetResourcePath("shaders/line.frag", lineFragPath, sizeof(lineFragPath));
+	GetResourcePath("shaders/triangle.frag", triFragPath, sizeof(triFragPath));
 
     shaderProgram = LoadShaderProgram(vertPath, fragPath);
     locModel = glGetUniformLocation(shaderProgram, "uModel");
@@ -68,6 +72,18 @@ void Renderer_Init(int screenWidth, int screenHeight) {
 	locLinePointA  = glGetUniformLocation(lineShaderProgram, "uPointA");
 	locLinePointB  = glGetUniformLocation(lineShaderProgram, "uPointB");
 	locLineRadius  = glGetUniformLocation(lineShaderProgram, "uRadius");
+
+
+	triangleShaderProgram = LoadShaderProgram(vertPath, triFragPath);
+	locTriModel  = glGetUniformLocation(triangleShaderProgram, "uModel");
+	locTriProj   = glGetUniformLocation(triangleShaderProgram, "uProj");
+	locTriColor  = glGetUniformLocation(triangleShaderProgram, "uColor");
+	locTriOrigin = glGetUniformLocation(triangleShaderProgram, "uOrigin");
+	locTriSize   = glGetUniformLocation(triangleShaderProgram, "uSize");
+	locTriPointA = glGetUniformLocation(triangleShaderProgram, "uPointA");
+	locTriPointB = glGetUniformLocation(triangleShaderProgram, "uPointB");
+	locTriPointC = glGetUniformLocation(triangleShaderProgram, "uPointC");
+	locTriRadius = glGetUniformLocation(triangleShaderProgram, "uRadius");
 
     float quadVertices[] = {
         0.0f, 1.0f,  0.0f, 1.0f,
@@ -112,6 +128,7 @@ void Renderer_Shutdown(void) {
     glDeleteProgram(roundedShaderProgram);
     glDeleteProgram(backgroundShaderProgram);
 	glDeleteProgram(lineShaderProgram);
+	glDeleteProgram(triangleShaderProgram);
 }
 
 static void DrawQuad(GLuint texture, float x, float y, float w, float h, vec4 color, int useTexture) {
@@ -267,4 +284,42 @@ void DrawDashedLine(float x1, float y1, float x2, float y2, float thickness, flo
 
         distanceCovered += patternLength;
     }
+}
+
+void DrawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, float cornerRadius, vec4 color) {
+    float minX = fminf(fminf(x1, x2), x3) - cornerRadius - TRIANGLE_AA_PADDING;
+    float maxX = fmaxf(fmaxf(x1, x2), x3) + cornerRadius + TRIANGLE_AA_PADDING;
+    float minY = fminf(fminf(y1, y2), y3) - cornerRadius - TRIANGLE_AA_PADDING;
+    float maxY = fmaxf(fmaxf(y1, y2), y3) + cornerRadius + TRIANGLE_AA_PADDING;
+
+    float originX = minX, originY = minY;
+    float w = maxX - minX, h = maxY - minY;
+
+    mat4 model;
+    glm_mat4_identity(model);
+    glm_translate(model, (vec3){originX, originY, 0.0f});
+    glm_scale(model, (vec3){w, h, 1.0f});
+
+    glUseProgram(triangleShaderProgram);
+    glUniformMatrix4fv(locTriModel, 1, GL_FALSE, (float*)model);
+    glUniformMatrix4fv(locTriProj, 1, GL_FALSE, (float*)projection);
+    glUniform4fv(locTriColor, 1, color);
+    glUniform2f(locTriOrigin, originX, originY);
+    glUniform2f(locTriSize, w, h);
+    glUniform2f(locTriPointA, x1, y1);
+    glUniform2f(locTriPointB, x2, y2);
+    glUniform2f(locTriPointC, x3, y3);
+    glUniform1f(locTriRadius, cornerRadius);
+
+    glBindVertexArray(quadVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void DrawETriangle(float x1, float y1,float l, float cornerRadius, vec4 color, char dir) {
+	if (dir == 'u') {
+		DrawTriangle(x1, y1, x1+l, y1, x1+l/2.0f, y1 - l*sqrtf(3)/2.0f, cornerRadius, color);
+	}
+	else if (dir == 'r') {
+		DrawTriangle(x1, y1, x1, y1 + l, x1 + l*sqrtf(3)/2.0f, y1 + l/2.0f, cornerRadius, color);
+	}
 }

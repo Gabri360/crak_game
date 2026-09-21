@@ -19,4 +19,7 @@ void DrawText(const char *text, float x, float y, float scale, vec4 color, vec4 
 void DrawLine(float x1, float y1, float x2, float y2, float thickness, vec4 color);
 void DrawDashedLine(float x1, float y1, float x2, float y2, float thickness, float dashLength, float gapLength, vec4 color);
 
+void DrawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, float cornerRadius, vec4 color);
+void DrawETriangle(float x1, float y1,float l, float cornerRadius, vec4 color, char dir);
+
 #endif
