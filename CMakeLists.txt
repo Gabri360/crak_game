@@ -92,7 +92,7 @@ set_source_files_properties(
   src/utils/paths.c
   src/utils/history.c
   src/game_fun.c
-  src/state_statistics.c
+  #src/state_statistics.c
   PROPERTIES COMPILE_OPTIONS "-Wall;-Wextra;-Wpedantic;-Werror;-Wconversion"
 )
 

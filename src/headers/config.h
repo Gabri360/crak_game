@@ -28,5 +28,7 @@
 #define IDLE_HOLD_TIME 1.0
 #define IDLE_FRAME_TIME 0.15
 
+#define STATISTICS_MOVE_DURATION 0.30f
+
 
 #endif
