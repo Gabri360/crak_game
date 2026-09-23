@@ -58,12 +58,14 @@ set(GAME_SOURCES
 set(VENDOR_SOURCES
   src/vendor/glad.c
   src/vendor/stb_image_impl.c
+  src/vendor/miniaudio_impl.c
 )
 
 set(RENDER_SOURCES
   src/render/renderer.c
   src/render/shader.c
   src/render/text_renderer.c
+  src/render/audio.c
 )
 
 set(UTILS_SOURCES
@@ -92,7 +94,7 @@ set_source_files_properties(
   src/utils/paths.c
   src/utils/history.c
   src/game_fun.c
-  #src/state_statistics.c
+  src/state_statistics.c
   PROPERTIES COMPILE_OPTIONS "-Wall;-Wextra;-Wpedantic;-Werror;-Wconversion"
 )
 

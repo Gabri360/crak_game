@@ -8,7 +8,8 @@
 #include "gamestate.h"
 #include "config.h"
 #include "game_fun.h"
-
+#include "audio.h"
+#include "paths.h"
 
 
 
@@ -42,8 +43,15 @@ int main(void) {
 
 	double lastTime = glfwGetTime();
 	srand((unsigned int)time(NULL));
+	Audio_Init();
 	Game_load();
 	Game_Init();
+
+
+    char musicPath[512];
+	GetResourcePath("assets/chiptune_loop.wav", musicPath, sizeof(musicPath));
+    Audio_PlayMusicLoop(musicPath, 0.5f);
+
 	//------------------------------------------- MAIN LOOP
     while (!glfwWindowShouldClose(window)) {
 
@@ -74,6 +82,7 @@ int main(void) {
         }
 	}
 	//--------------------------------------------
+	Audio_Shutdown();
     Renderer_Shutdown();
     glfwTerminate();
     return 0;
