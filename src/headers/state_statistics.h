@@ -11,5 +11,6 @@ void statistics_run(void);
 void statistics_handle_events(GLFWwindow* window);
 void statistics_esc(void);
 void statistics_shutdown(void);
+void set_prev_state(int i);
 
 #endif

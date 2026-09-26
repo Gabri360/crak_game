@@ -10,6 +10,7 @@
 #include "config.h"
 #include "history.h"
 
+static GameState prev_state;
 
 static float frame_anim_time;
 static vec4 color_frame;
@@ -70,6 +71,21 @@ static int isMoving;
 static float pos_schede;
 static float pos_schedeStartX;
 static float pos_schedeEndX;
+
+static int n_keys;
+static vec4 color_keys;
+static vec4 color_selected_key;
+static int select_key;
+static float key_startX;
+static float key_endX;
+static float key_posX;
+static int key_isMoving;
+static float key_moveElapsed;
+
+static float apkey_posX;
+static float apkey_moveElapsed;
+
+
 
 static void draw_frame(void) {
 
@@ -167,8 +183,8 @@ static void draw_score_data(void) {
 		DrawRoundedRect(coord_graph[0] + padding + pos_tar + 5.0f, coord_graph[1] + dim_graph[1] - padding-(float)histogram_score_data[i]*unitH -(float)histogram_score_data[i+1]*unitH+ dim_frame[1], spacing, (float)histogram_score_data[i]*unitH + (float)histogram_score_data[i+1]*unitH, color_histo_data, 2.0f, color_histo_data_border, 2.0f);
 
 		if (histogram_score_data[i] != 0) {
-		snprintf(text, sizeof(text), "%d", histogram_score_data[i] + histogram_score_data[i+1]);
-		DrawText(text, coord_graph[0] + padding + pos_tar + 7.0f, coord_graph[1] + dim_graph[1] - padding-(float)histogram_score_data[i]*unitH - (float)histogram_score_data[i+1]*unitH - 5.0f + dim_frame[1], 0.18f, blank,color_histo_data, text_border_width);
+			snprintf(text, sizeof(text), "%d", histogram_score_data[i] + histogram_score_data[i+1]);
+			DrawText(text, coord_graph[0] + padding + pos_tar + 7.0f, coord_graph[1] + dim_graph[1] - padding-(float)histogram_score_data[i]*unitH - (float)histogram_score_data[i+1]*unitH - 5.0f + dim_frame[1], 0.18f, blank,color_histo_data, text_border_width);
 		}
 	}
 
@@ -192,8 +208,8 @@ static void draw_time_data(void) {
 		DrawRoundedRect(coord_graph[0] + padding + pos_tar + 5.0f, coord_graph[1] + dim_graph[1] - padding-(float)histogram_time_data[i]*unitH, spacing, (float)histogram_time_data[i]*unitH, color_histo_data, 2.0f, color_histo_data_border, 2.0f);
 
 		if (histogram_time_data[i] != 0) {
-		snprintf(text, sizeof(text), "%d", histogram_time_data[i]);
-		DrawText(text, coord_graph[0] + padding + pos_tar + 10.0f, coord_graph[1] + dim_graph[1] - padding-(float)histogram_time_data[i]*unitH - 5.0f, 0.3f, blank,color_histo_data, text_border_width);
+			snprintf(text, sizeof(text), "%d", histogram_time_data[i]);
+			DrawText(text, coord_graph[0] + padding + pos_tar + 10.0f, coord_graph[1] + dim_graph[1] - padding-(float)histogram_time_data[i]*unitH - 5.0f, 0.3f, blank,color_histo_data, text_border_width);
 		}
 	}
 
@@ -274,6 +290,48 @@ static void draw_bar(void) {
 	DrawRoundedRect(coord_frame[0] + dim_frame[0] - 40.0f, coord_frame[1] + bar_padding + barPosX*dim_bar[1] / 2.0f, dim_bar[0], dim_bar[1] / 2.0f, color_bar, 5.0f, blank2, 2.0f);
 }
 
+
+static void draw_keys(void) {
+	float padding_keys = 25.0f;
+	float coord_keys[2] = {coord_frame[0], coord_frame[1] + dim_frame[1] + 20.0f + apkey_posX};
+
+	char text[32];
+	if (prev_state == STATE_GAMEOVER) {
+
+		DrawRoundedRect(coord_keys[0],coord_keys[1], dim_frame[0]/3.0f-padding_keys*2.0f/3.0f, 50.0f, color_keys, 5.0f, black, 2.0f);
+		DrawRoundedRect(coord_keys[0]+ dim_frame[0]/3.0f+padding_keys/3.0f,coord_keys[1], dim_frame[0]/3.0f-padding_keys*2.0f/3.0f, 50.0f, color_keys, 5.0f, black, 2.0f);
+		DrawRoundedRect(coord_keys[0]+ dim_frame[0]*2.0f/3.0f+padding_keys*2.0f/3.0f,coord_keys[1], dim_frame[0]/3.0f-padding_keys*2.0f/3.0f, 50.0f, color_keys, 5.0f, black, 2.0f);
+
+		DrawRoundedRect(coord_keys[0] + ( dim_frame[0]/3.0f+padding_keys/3.0f) * key_posX,coord_keys[1], dim_frame[0]/3.0f-padding_keys*2.0f/3.0f, 50.0f, color_selected_key, 5.0f, blank, 2.0f);
+
+
+
+		snprintf(text, sizeof(text), "EXIT");
+		DrawText(text, coord_keys[0] + 85.0f, coord_keys[1] + 35.0f, 0.6f, text_color,text_border_color,text_border_width);
+		snprintf(text, sizeof(text), "RESTART");
+		DrawText(text, coord_keys[0] + ( dim_frame[0]/3.0f+padding_keys/3.0f) + 55.0f, coord_keys[1] + 35.0f, 0.6f, text_color,text_border_color,text_border_width);
+		snprintf(text, sizeof(text), "DATA");
+		DrawText(text, coord_keys[0]+ dim_frame[0]*2.0f/3.0f+padding_keys*2.0f/3.0f + 75.0f, coord_keys[1] + 35.0f, 0.6f, text_color,text_border_color,text_border_width);
+
+
+
+	}
+	else if (prev_state == STATE_PLAY) {
+
+		DrawRoundedRect(coord_keys[0],coord_keys[1], dim_frame[0]/2.0f-padding_keys, 50.0f, color_keys, 5.0f, black, 2.0f);
+		DrawRoundedRect(coord_keys[0]+ dim_frame[0]/2.0f+padding_keys,coord_keys[1], dim_frame[0]/2.0f-padding_keys, 50.0f, color_keys, 5.0f, black, 2.0f);
+
+		DrawRoundedRect(coord_keys[0] + ( dim_frame[0]/2.0f+padding_keys) * key_posX,coord_keys[1], dim_frame[0]/2.0f-padding_keys, 50.0f, color_selected_key, 5.0f, blank, 2.0f);
+		snprintf(text, sizeof(text), "EXIT");
+		DrawText(text, coord_keys[0] + 140.0f, coord_keys[1] + 35.0f, 0.6f, text_color,text_border_color,text_border_width);
+
+		snprintf(text, sizeof(text), "DATA");
+		DrawText(text, coord_keys[0]+ dim_frame[0]/2.0f+padding_keys + 133.0f, coord_keys[1] + 35.0f, 0.6f, text_color,text_border_color,text_border_width);
+	}
+}
+
+
+
 void statistics_load(void) {
 	fill_color(color_frame_border, 20.0f, 20.0f, 20.0f, 1.0f);
 	fill_color(color_frame, 20.0f, 20.0f, 20.0f, 0.8f);
@@ -290,11 +348,15 @@ void statistics_load(void) {
 	fill_color(black, 0.0f, 0.0f, 0.0f, 1.0f);
 	fill_color(color_bar, 255.0f, 145.0f, 0.1f, 0.5f);
 	fill_color(color_bar_bg, 20.0f, 20.0f, 20.0f, 0.9f);
+	fill_color(color_keys, 20.0f, 20.0f, 20.0f, 0.4f);
+	fill_color(color_selected_key, 255.0f, 146.0f, 0.1f, 0.4f);
 
 
 
-
-
+	apkey_moveElapsed = 0.0f;
+	key_isMoving = 0;
+	select_key = 0;
+	key_posX = 0.0f;
 	text_border_width = 3.5f;
 	border_radius_frame = 10.0f;
 	border_width_frame = 5.0f;
@@ -341,7 +403,10 @@ void statistics_init(void) {
 void statistics_enter(void) {
 	game_time = 0.0f;
 	frame_anim_time = 0.0f;
+	select_key = 0;
+	key_posX = 0.0f;
 
+	apkey_moveElapsed = 0.0f;
 	count_history_load = History_LoadAll(history, max_history_load);
 
 	record = max_score(history, max_history_load);
@@ -369,6 +434,24 @@ void statistics_update(double dt) {
 		pos_leg[1] = coord_frame[1] + 50.0f + leg_padding + pos_schede *  dim_frame[1];
 	}
 
+	if (key_isMoving) {
+		key_moveElapsed += (float)dt;
+		float t = key_moveElapsed / (float) KEY_MOVE_DURATION;
+		if (t >= 1.0f) {
+			t = 1.0f;
+			key_isMoving = 0;
+		}
+		key_posX = Lerp(key_startX, key_endX, EaseOutBack2(t, 1.3f));
+	}
+	if (game_time < APKEY_MOVE_DURATION) {
+		apkey_moveElapsed += (float)dt;
+		float t = apkey_moveElapsed / (float) APKEY_MOVE_DURATION;
+		if (t >= 1.0f) {
+			t = 1.0f;
+		}
+		apkey_posX = Lerp((float)WIN_H -coord_frame[1] - dim_frame[1] - 20.0f, 0.0f, EaseOutBack2(t, 1.3f));
+	}
+
 }
 
 void statistics_run(void) {
@@ -383,19 +466,21 @@ void statistics_run(void) {
 	draw_bar();
     glDisable(GL_SCISSOR_TEST);
 
+	draw_keys();
+
 
 }
 
 void statistics_handle_events(GLFWwindow* window) {
-    if (Input_KeyPressed(window, GLFW_KEY_ESCAPE) || Input_KeyPressed(window, GLFW_KEY_Q)) {
+    if (Input_KeyPressed(window, GLFW_KEY_ESCAPE)) {
 		Game_Shutdown();
         glfwSetWindowShouldClose(window, 1);
 	}
-	if (Input_KeyPressed(window, GLFW_KEY_S)) {
-		GameState newstate = STATE_PLAY;
+	else if (Input_KeyPressed(window, GLFW_KEY_S) || Input_KeyPressed(window, GLFW_KEY_Q)) {
+		GameState newstate = prev_state;
 		Game_SetState(newstate);
 	}
-	if (Input_KeyPressed(window, GLFW_KEY_DOWN) && bar_pos == 0.0f) {
+	else if (Input_KeyPressed(window, GLFW_KEY_DOWN) && bar_pos == 0.0f) {
 		barStartX = bar_pos;
 		bar_pos = 1.0f;
 		barEndX = bar_pos;
@@ -405,7 +490,7 @@ void statistics_handle_events(GLFWwindow* window) {
 		pos_schede = -1.0f;
 		pos_schedeEndX = pos_schede;
 	}
-	if (Input_KeyPressed(window, GLFW_KEY_UP) && bar_pos == 1.0f) {
+	else if (Input_KeyPressed(window, GLFW_KEY_UP) && bar_pos == 1.0f) {
 		barStartX = bar_pos;
 		bar_pos = 0.0f;
 		barEndX = bar_pos;
@@ -414,6 +499,76 @@ void statistics_handle_events(GLFWwindow* window) {
 		pos_schedeStartX = pos_schede;
 		pos_schede = 0.0f;
 		pos_schedeEndX = pos_schede;
+	}
+	else if (Input_KeyPressed(window, GLFW_KEY_RIGHT) || Input_KeyPressed(window, GLFW_KEY_D)) {
+		if(n_keys == 2 && select_key == 0) {
+			key_startX = (float)select_key;
+			select_key = 1;
+			key_endX = (float)select_key;
+			key_isMoving = 1;
+			key_moveElapsed = 0.0f;
+		}
+		else if (n_keys == 3 && select_key != 2) {
+			key_startX = (float)select_key;
+			select_key += 1;
+			key_endX = (float)select_key;
+			key_isMoving = 1;
+			key_moveElapsed = 0.0f;
+		}
+	}
+	else if (Input_KeyPressed(window, GLFW_KEY_LEFT) || Input_KeyPressed(window, GLFW_KEY_A)) {
+		if (n_keys == 2 && select_key == 1) {
+			key_startX = (float)select_key;
+			select_key = 0;
+			key_endX = (float)select_key;
+			key_isMoving = 1;
+			key_moveElapsed = 0.0f;
+		}
+		else if (n_keys == 3 && select_key != 0) {
+			key_startX = (float)select_key;
+			select_key -= 1;
+			key_endX = (float)select_key;
+			key_isMoving = 1;
+			key_moveElapsed = 0.0f;
+		}
+	}
+	else if (Input_KeyPressed(window, GLFW_KEY_ENTER) || Input_KeyPressed(window, GLFW_KEY_SPACE)) {
+		if (n_keys == 2) {
+			if (select_key == 0) {
+				GameState newstate = STATE_PLAY;
+				Game_SetState(newstate);
+			}
+			else if (select_key == 1) {
+
+			}
+		}
+		else if (n_keys == 3) {
+			if (select_key == 0) {
+				GameState newstate = STATE_GAMEOVER;
+				Game_SetState(newstate);
+			}
+			else if (select_key == 1) {
+				GameState newstate = STATE_PLAY;
+				Game_Init();
+				Game_SetState(newstate);
+			}
+		}
+	}
+	else if (Input_KeyPressed(window, GLFW_KEY_R) && prev_state == STATE_GAMEOVER) {
+		GameState newstate = STATE_PLAY;
+		Game_Init();
+		Game_SetState(newstate);
+	}
+}
+
+void set_prev_state(int i) {
+	if (i==0) {
+		prev_state = STATE_PLAY;
+		n_keys = 2;
+	}
+	else if (i==1) {
+		prev_state = STATE_GAMEOVER;
+		n_keys = 3;
 	}
 }
 

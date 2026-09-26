@@ -8,6 +8,7 @@
 #include "game_fun.h"
 #include "config.h"
 #include "history.h"
+#include "state_statistics.h"
 #include <string.h>
 
 static GLuint idle_right[9];
@@ -468,33 +469,36 @@ void state_play_run(void) {
 void state_play_handle_events(GLFWwindow* window) {
 
 
-    if (Input_KeyPressed(window, GLFW_KEY_ESCAPE) || Input_KeyPressed(window, GLFW_KEY_Q)) {
+    if (Input_KeyPressed(window, GLFW_KEY_ESCAPE)) {
 		Game_Shutdown();
         glfwSetWindowShouldClose(window, 1);
 	}
-	if (Input_KeyPressed(window, GLFW_KEY_SPACE)) {
+	else if (Input_KeyPressed(window, GLFW_KEY_SPACE)) {
 		GameState newstate = STATE_PAUSED;
 		Game_SetState(newstate);
 		isPaused = 1;
 	}
-
-    if ((Input_KeyPressed(window, GLFW_KEY_RIGHT) || Input_KeyPressed(window, GLFW_KEY_D)) && player_pos != 2) {
+    else if ((Input_KeyPressed(window, GLFW_KEY_RIGHT) || Input_KeyPressed(window, GLFW_KEY_D)) && player_pos != 2) {
 		startX = PlayerGridToPixelX(player_pos);
         player_pos += 1;
         is_moving_right = 1;
 		update_after_press();
 
     }
-    if ((Input_KeyPressed(window, GLFW_KEY_LEFT) || Input_KeyPressed(window, GLFW_KEY_A)) && player_pos != 0) {
+    else if ((Input_KeyPressed(window, GLFW_KEY_LEFT) || Input_KeyPressed(window, GLFW_KEY_A)) && player_pos != 0) {
 		startX = PlayerGridToPixelX(player_pos);
         player_pos -= 1;
         is_moving_right = 0;
         update_after_press();
     }
-	if (Input_KeyPressed(window, GLFW_KEY_S) && score == 0) {
+	else if (Input_KeyPressed(window, GLFW_KEY_S) && score == 0) {
 		GameState newstate = STATE_STATISTICS;
 		Game_SetState(newstate);
 		isStatistic = 1;
+		set_prev_state(0);
+	}
+	else if (Input_KeyPressed(window, GLFW_KEY_R)) {
+		Game_Init();
 	}
 }
 

@@ -53,6 +53,13 @@ float EaseOutBack(float t) {
     return 1.0f + c3 * tm1 * tm1 * tm1 + c1 * tm1 * tm1;
 }
 
+float EaseOutBack2(float t, float c1) {
+    const float c3 = c1 + 1.0f;
+
+    float tm1 = t - 1.0f;
+    return 1.0f + c3 * tm1 * tm1 * tm1 + c1 * tm1 * tm1;
+}
+
 void grid_to_pixel(int pos_grid[], float pos_pixel[])
 {
 	int cell_width = WIN_W / 3;
