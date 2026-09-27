@@ -296,7 +296,7 @@ static void draw_keys(void) {
 	float coord_keys[2] = {coord_frame[0], coord_frame[1] + dim_frame[1] + 20.0f + apkey_posX};
 
 	char text[32];
-	if (prev_state == STATE_GAMEOVER) {
+	if (prev_state == STATE_GAMEOVER || prev_state == STATE_PAUSED) {
 
 		DrawRoundedRect(coord_keys[0],coord_keys[1], dim_frame[0]/3.0f-padding_keys*2.0f/3.0f, 50.0f, color_keys, 5.0f, black, 2.0f);
 		DrawRoundedRect(coord_keys[0]+ dim_frame[0]/3.0f+padding_keys/3.0f,coord_keys[1], dim_frame[0]/3.0f-padding_keys*2.0f/3.0f, 50.0f, color_keys, 5.0f, black, 2.0f);
@@ -418,7 +418,8 @@ void statistics_update(double dt) {
 	game_time += dt;
 	frame_anim_time += (float)dt;
 
-	state_play_update(dt);
+	if (prev_state != STATE_PAUSED)
+		state_play_update(dt);
 
 	if (isMoving) {
 		bar_moveElapsed += (float)dt;
@@ -472,7 +473,11 @@ void statistics_run(void) {
 }
 
 void statistics_handle_events(GLFWwindow* window) {
-    if (Input_KeyPressed(window, GLFW_KEY_ESCAPE)) {
+
+
+	bool ctrlHeld = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS;
+
+    if (ctrlHeld && Input_KeyPressed(window, GLFW_KEY_Q)) {
 		Game_Shutdown();
         glfwSetWindowShouldClose(window, 1);
 	}
@@ -544,7 +549,7 @@ void statistics_handle_events(GLFWwindow* window) {
 		}
 		else if (n_keys == 3) {
 			if (select_key == 0) {
-				GameState newstate = STATE_GAMEOVER;
+				GameState newstate = prev_state;
 				Game_SetState(newstate);
 			}
 			else if (select_key == 1) {
@@ -568,6 +573,10 @@ void set_prev_state(int i) {
 	}
 	else if (i==1) {
 		prev_state = STATE_GAMEOVER;
+		n_keys = 3;
+	}
+	else if (i==2) {
+		prev_state = STATE_PAUSED;
 		n_keys = 3;
 	}
 }

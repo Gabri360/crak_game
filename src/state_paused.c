@@ -8,6 +8,7 @@
 #include "game_fun.h"
 #include "config.h"
 #include "state_play.h"
+#include "state_statistics.h"
 
 static double game_time;
 static vec4 icon_color;
@@ -77,13 +78,26 @@ void state_paused_run(void) {
 
 void state_paused_handle_events(GLFWwindow* window) {
 
-    if (Input_KeyPressed(window, GLFW_KEY_ESCAPE) || Input_KeyPressed(window, GLFW_KEY_Q)) {
+
+	bool ctrlHeld = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS;
+
+    if (ctrlHeld && Input_KeyPressed(window, GLFW_KEY_Q)) {
 		state_paused_shutdown();
         glfwSetWindowShouldClose(window, 1);
 	}
-	if (Input_KeyPressed(window, GLFW_KEY_SPACE)) {
+	else if (Input_KeyPressed(window, GLFW_KEY_SPACE)) {
 		GameState newstate = STATE_PLAY;
 		Game_SetState(newstate);
+	}
+	else if (Input_KeyPressed(window, GLFW_KEY_R)) {
+		GameState newstate = STATE_PLAY;
+		Game_Init();
+		Game_SetState(newstate);
+	}
+	else if(Input_KeyPressed(window, GLFW_KEY_S)) {
+		GameState newstate = STATE_STATISTICS;
+		Game_SetState(newstate);
+		set_prev_state(2);
 	}
 }
 

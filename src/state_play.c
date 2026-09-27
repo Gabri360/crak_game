@@ -468,8 +468,9 @@ void state_play_run(void) {
 
 void state_play_handle_events(GLFWwindow* window) {
 
+	bool ctrlHeld = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS;
 
-    if (Input_KeyPressed(window, GLFW_KEY_ESCAPE)) {
+    if (ctrlHeld && Input_KeyPressed(window, GLFW_KEY_Q)) {
 		Game_Shutdown();
         glfwSetWindowShouldClose(window, 1);
 	}
