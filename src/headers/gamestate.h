@@ -19,6 +19,8 @@ void Game_handle_events(GLFWwindow* window);
 void Game_Shutdown(void);
 void Game_state_esc(void);
 void Game_SetState(GameState newState);
-void draw_prev_state(GameState prev_state);
+void draw_prev_state(void);
+GameState return_pop_prev_state(void);
+GameState return_prev_state(void);
 
 #endif

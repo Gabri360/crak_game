@@ -12,6 +12,5 @@ void state_options_run(void);
 void state_options_handle_events(GLFWwindow* window);
 void state_options_esc(void);
 void state_options_shutdown(void);
-void set_prev_state_options(GameState prev_state_give);
 
 #endif

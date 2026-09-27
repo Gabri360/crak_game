@@ -9,7 +9,6 @@
 #include "config.h"
 #include "history.h"
 
-static GameState prev_state;
 
 static float frame_anim_time;
 static vec4 color_frame;
@@ -403,8 +402,9 @@ void statistics_update(double dt) {
 	game_time += dt;
 	frame_anim_time += (float)dt;
 
-	if (prev_state != STATE_PAUSED)
+	if (return_prev_state()!=STATE_PAUSED && return_prev_state()!=STATE_OPTIONS) {
 		state_play_update(dt);
+	}
 
 	if (isMoving) {
 		bar_moveElapsed += (float)dt;
@@ -467,8 +467,7 @@ void statistics_handle_events(GLFWwindow* window) {
         glfwSetWindowShouldClose(window, 1);
 	}
 	else if (Input_KeyPressed(window, GLFW_KEY_S) || Input_KeyPressed(window, GLFW_KEY_Q)) {
-		GameState newstate = prev_state;
-		Game_SetState(newstate);
+		Game_SetState(return_pop_prev_state());
 	}
 	else if (Input_KeyPressed(window, GLFW_KEY_DOWN) && bar_pos == 0.0f) {
 		barStartX = bar_pos;
@@ -506,8 +505,7 @@ void statistics_handle_events(GLFWwindow* window) {
 	}
 	else if (Input_KeyPressed(window, GLFW_KEY_ENTER) || Input_KeyPressed(window, GLFW_KEY_SPACE)) {
 		if (select_key == 0) {
-			GameState newstate = prev_state;
-			Game_SetState(newstate);
+			Game_SetState(return_pop_prev_state());
 		}
 		else if (select_key == 1) {
 			GameState newstate = STATE_PLAY;
@@ -515,7 +513,7 @@ void statistics_handle_events(GLFWwindow* window) {
 			Game_SetState(newstate);
 		}
 	}
-	else if (Input_KeyPressed(window, GLFW_KEY_R) && prev_state == STATE_GAMEOVER) {
+	else if (Input_KeyPressed(window, GLFW_KEY_R)) {
 		GameState newstate = STATE_PLAY;
 		Game_Init();
 		Game_SetState(newstate);
@@ -526,9 +524,6 @@ void statistics_handle_events(GLFWwindow* window) {
 	}
 }
 
-void set_prev_state_statistics(GameState prev_state_give) {
-	prev_state = prev_state_give;
-}
 
 void statistics_esc(void) {
 

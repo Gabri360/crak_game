@@ -26,6 +26,7 @@ static int player_pos;
 static int is_moving_right;
 static int score;
 static int isAlive;
+static int isPlay;
 
 static double max_time;
 
@@ -42,7 +43,6 @@ static float targetX;
 static float moveElapsed;
 static int isMoving;
 static int isPaused;
-static int isStatistic;
 static double time_post_paused;
 static float platX;
 
@@ -361,7 +361,6 @@ void state_play_init(void) {
     targetX = playerX;
     isMoving = 0;
 	isPaused = 0;
-	isStatistic = 0;
 	time_post_paused = 0.0;
 	platX = 0;
 	score = 0;
@@ -389,7 +388,7 @@ void state_play_enter(void) {
 	PendX = (float)(WIN_W*3/5);
 	time_post_paused = 0;
 	isAlive = 1;
-	isStatistic = 0;
+	isPlay = 1;
 }
 
 void state_play_update(double dt) {
@@ -416,7 +415,7 @@ void state_play_update(double dt) {
 	}
 
 
-	if (score != 0 && isAlive && isStatistic == 0) {
+	if (score != 0 && isAlive && isPlay) {
 		game_time += dt;
 	}
 	time_in_state += dt;
@@ -478,6 +477,7 @@ void state_play_handle_events(GLFWwindow* window) {
 		GameState newstate = STATE_PAUSED;
 		Game_SetState(newstate);
 		isPaused = 1;
+		isPlay = 0;
 	}
     else if ((Input_KeyPressed(window, GLFW_KEY_RIGHT) || Input_KeyPressed(window, GLFW_KEY_D)) && player_pos != 2) {
 		startX = PlayerGridToPixelX(player_pos);
@@ -495,11 +495,12 @@ void state_play_handle_events(GLFWwindow* window) {
 	else if (Input_KeyPressed(window, GLFW_KEY_S) && score == 0) {
 		GameState newstate = STATE_STATISTICS;
 		Game_SetState(newstate);
-		isStatistic = 1;
+		isPlay = 0;
 	}
 	else if (Input_KeyPressed(window, GLFW_KEY_ESCAPE)) {
 		GameState newstate = STATE_OPTIONS;
 		Game_SetState(newstate);
+		isPlay = 0;
 	}
 	else if (Input_KeyPressed(window, GLFW_KEY_R)) {
 		Game_Init();
