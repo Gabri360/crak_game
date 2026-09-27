@@ -2,6 +2,7 @@
 #define STATE_STATISTICS_H
 
 
+#include "gamestate.h"
 
 void statistics_load(void);
 void statistics_init(void);
@@ -11,6 +12,6 @@ void statistics_run(void);
 void statistics_handle_events(GLFWwindow* window);
 void statistics_esc(void);
 void statistics_shutdown(void);
-void set_prev_state(int i);
+void set_prev_state_statistics(GameState prev_state_give);
 
 #endif

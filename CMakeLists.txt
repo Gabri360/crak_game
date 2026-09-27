@@ -53,6 +53,7 @@ set(GAME_SOURCES
   src/game_fun.c
   src/state_gameover.c
   src/state_statistics.c
+  src/state_options.c
 )
 
 set(VENDOR_SOURCES
@@ -95,6 +96,7 @@ set_source_files_properties(
   src/utils/history.c
   src/game_fun.c
   src/state_statistics.c
+  src/state_options.c
   PROPERTIES COMPILE_OPTIONS "-Wall;-Wextra;-Wpedantic;-Werror;-Wconversion"
 )
 

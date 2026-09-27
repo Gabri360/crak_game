@@ -496,7 +496,10 @@ void state_play_handle_events(GLFWwindow* window) {
 		GameState newstate = STATE_STATISTICS;
 		Game_SetState(newstate);
 		isStatistic = 1;
-		set_prev_state(0);
+	}
+	else if (Input_KeyPressed(window, GLFW_KEY_ESCAPE)) {
+		GameState newstate = STATE_OPTIONS;
+		Game_SetState(newstate);
 	}
 	else if (Input_KeyPressed(window, GLFW_KEY_R)) {
 		Game_Init();

@@ -48,6 +48,8 @@ static float key_moveElapsed;
 static float apkey_posX;
 static float apkey_moveElapsed;
 
+static GameState prev_state;
+
 static void draw_leaderboard(void) {
 
 	float revealW, revealH;
@@ -177,11 +179,14 @@ void state_gameover_enter(void) {
 	count_history_load = History_LoadAll(history, (size_t)max_history_load);
 	n_records = top_five_scores(history, (int)count_history_load, records);
 
-	game_time = 0.0f;
-	lb_anim_time = 0.0f;
-	apkey_moveElapsed = 0.0f;
-	select_key = 0;
-	key_posX = 0.0f;
+
+	if (prev_state != STATE_OPTIONS) {
+		game_time = 0.0f;
+		lb_anim_time = 0.0f;
+		apkey_moveElapsed = 0.0f;
+		select_key = 0;
+		key_posX = 0.0f;
+	}
 }
 
 void state_gameover_update(double dt) {
@@ -232,14 +237,12 @@ void state_gameover_handle_events(GLFWwindow* window) {
 		}
 		else if (select_key ==1) {
 			newstate = STATE_STATISTICS;
-			set_prev_state(1);
 		}
 		Game_SetState(newstate);
 	}
 	else if (Input_KeyPressed(window, GLFW_KEY_S)) {
 		GameState newstate = STATE_STATISTICS;
 		Game_SetState(newstate);
-		set_prev_state(1);
 	}
 	else if (Input_KeyPressed(window, GLFW_KEY_R)  || Input_KeyPressed(window, GLFW_KEY_Q)) {
 		GameState newstate = STATE_PLAY;
@@ -253,7 +256,6 @@ void state_gameover_handle_events(GLFWwindow* window) {
 		key_isMoving = 1;
 		key_moveElapsed = 0.0f;
 	}
-
 	else if ((Input_KeyPressed(window, GLFW_KEY_LEFT) || Input_KeyPressed(window, GLFW_KEY_A))&& select_key == 1) {
 		key_startX = (float)select_key;
 		select_key = 0;
@@ -261,7 +263,14 @@ void state_gameover_handle_events(GLFWwindow* window) {
 		key_isMoving = 1;
 		key_moveElapsed = 0.0f;
 	}
+	else if (Input_KeyPressed(window, GLFW_KEY_ESCAPE)) {
+		GameState newstate = STATE_OPTIONS;
+		Game_SetState(newstate);
+	}
+}
 
+void set_prev_state_gameover(GameState prev_state_give) {
+	prev_state = prev_state_give;
 }
 
 void state_gameover_esc(void) {

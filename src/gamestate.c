@@ -5,6 +5,7 @@
 #include "state_paused.h"
 #include "state_gameover.h"
 #include "state_statistics.h"
+#include "state_options.h"
 
 GameState currentState = STATE_PLAY;
 
@@ -14,6 +15,7 @@ void Game_load(void) {
 	gameover_load();
 	paused_load();
 	statistics_load();
+	options_load();
 }
 
 void Game_Init(void) {
@@ -21,6 +23,7 @@ void Game_Init(void) {
     state_paused_init();
     state_gameover_init();
 	statistics_init();
+	state_options_init();
 }
 
 void Game_state_enter(void) {
@@ -36,6 +39,9 @@ void Game_state_enter(void) {
         break;
 	case STATE_STATISTICS:
 		statistics_enter();
+		break;
+	case STATE_OPTIONS:
+		state_options_enter();
 		break;
     }
 }
@@ -53,6 +59,10 @@ void Game_Update(double dt) {
         break;
 	case STATE_STATISTICS:
 		statistics_update(dt);
+		break;
+	case STATE_OPTIONS:
+		state_options_update(dt);
+		break;
     }
 }
 
@@ -69,6 +79,9 @@ void Game_Run(void) {
         break;
 	case STATE_STATISTICS:
 		statistics_run();
+		break;
+	case STATE_OPTIONS:
+		state_options_run();
 		break;
     }
 }
@@ -87,6 +100,9 @@ void Game_handle_events(GLFWwindow* window) {
 	case STATE_STATISTICS:
 		statistics_handle_events(window);
 		break;
+	case STATE_OPTIONS:
+		state_options_handle_events(window);
+		break;
     }
 }
 
@@ -104,6 +120,9 @@ void Game_state_esc(void) {
 	case STATE_STATISTICS:
 		statistics_esc();
 		break;
+	case STATE_OPTIONS:
+		state_options_esc();
+		break;
     }
 }
 
@@ -112,11 +131,35 @@ void Game_Shutdown(void) {
 	state_paused_shutdown();
 	state_gameover_shutdown();
 	statistics_shutdown();
+	state_options_shutdown();
 }
 
 
 void Game_SetState(GameState newState) {
+	set_prev_state_statistics(currentState);
+	set_prev_state_options(currentState);
+	set_prev_state_gameover(currentState);
 	Game_state_esc();
     currentState = newState;
 	Game_state_enter();
+}
+
+void draw_prev_state(GameState prev_state) {
+	switch (prev_state) {
+    case STATE_PLAY:
+        state_play_run();
+        break;
+    case STATE_PAUSED:
+		state_paused_run();
+        break;
+    case STATE_GAMEOVER:
+		state_gameover_run();
+        break;
+	case STATE_STATISTICS:
+		statistics_run();
+		break;
+	case STATE_OPTIONS:
+		state_options_run();
+		break;
+    }
 }

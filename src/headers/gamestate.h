@@ -5,7 +5,8 @@ typedef enum {
     STATE_PLAY,
     STATE_PAUSED,
     STATE_GAMEOVER,
-	STATE_STATISTICS
+	STATE_STATISTICS,
+	STATE_OPTIONS
 } GameState;
 
 
@@ -18,4 +19,6 @@ void Game_handle_events(GLFWwindow* window);
 void Game_Shutdown(void);
 void Game_state_esc(void);
 void Game_SetState(GameState newState);
+void draw_prev_state(GameState prev_state);
+
 #endif

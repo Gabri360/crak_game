@@ -1,7 +1,6 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include "state_statistics.h"
-#include "gamestate.h"
 #include "state_play.h"
 #include "renderer.h"
 #include "input.h"
@@ -72,7 +71,6 @@ static float pos_schede;
 static float pos_schedeStartX;
 static float pos_schedeEndX;
 
-static int n_keys;
 static vec4 color_keys;
 static vec4 color_selected_key;
 static int select_key;
@@ -298,38 +296,23 @@ static void draw_keys(void) {
 	float coord_keys[2] = {coord_frame[0], coord_frame[1] + dim_frame[1] + 20.0f + apkey_posX};
 
 	char text[32];
-	if (prev_state == STATE_GAMEOVER || prev_state == STATE_PAUSED) {
 
-		DrawRoundedRect(coord_keys[0],coord_keys[1], dim_frame[0]/3.0f-padding_keys*2.0f/3.0f, 50.0f, color_keys, 5.0f, black, 2.0f);
-		DrawRoundedRect(coord_keys[0]+ dim_frame[0]/3.0f+padding_keys/3.0f,coord_keys[1], dim_frame[0]/3.0f-padding_keys*2.0f/3.0f, 50.0f, color_keys, 5.0f, black, 2.0f);
-		DrawRoundedRect(coord_keys[0]+ dim_frame[0]*2.0f/3.0f+padding_keys*2.0f/3.0f,coord_keys[1], dim_frame[0]/3.0f-padding_keys*2.0f/3.0f, 50.0f, color_keys, 5.0f, black, 2.0f);
+	DrawRoundedRect(coord_keys[0],coord_keys[1], dim_frame[0]/3.0f-padding_keys*2.0f/3.0f, 50.0f, color_keys, 5.0f, black, 2.0f);
+	DrawRoundedRect(coord_keys[0]+ dim_frame[0]/3.0f+padding_keys/3.0f,coord_keys[1], dim_frame[0]/3.0f-padding_keys*2.0f/3.0f, 50.0f, color_keys, 5.0f, black, 2.0f);
+	DrawRoundedRect(coord_keys[0]+ dim_frame[0]*2.0f/3.0f+padding_keys*2.0f/3.0f,coord_keys[1], dim_frame[0]/3.0f-padding_keys*2.0f/3.0f, 50.0f, color_keys, 5.0f, black, 2.0f);
 
-		DrawRoundedRect(coord_keys[0] + ( dim_frame[0]/3.0f+padding_keys/3.0f) * key_posX,coord_keys[1], dim_frame[0]/3.0f-padding_keys*2.0f/3.0f, 50.0f, color_selected_key, 5.0f, blank, 2.0f);
-
-
-
-		snprintf(text, sizeof(text), "EXIT");
-		DrawText(text, coord_keys[0] + 85.0f, coord_keys[1] + 35.0f, 0.6f, text_color,text_border_color,text_border_width);
-		snprintf(text, sizeof(text), "RESTART");
-		DrawText(text, coord_keys[0] + ( dim_frame[0]/3.0f+padding_keys/3.0f) + 55.0f, coord_keys[1] + 35.0f, 0.6f, text_color,text_border_color,text_border_width);
-		snprintf(text, sizeof(text), "DATA");
-		DrawText(text, coord_keys[0]+ dim_frame[0]*2.0f/3.0f+padding_keys*2.0f/3.0f + 75.0f, coord_keys[1] + 35.0f, 0.6f, text_color,text_border_color,text_border_width);
+	DrawRoundedRect(coord_keys[0] + ( dim_frame[0]/3.0f+padding_keys/3.0f) * key_posX,coord_keys[1], dim_frame[0]/3.0f-padding_keys*2.0f/3.0f, 50.0f, color_selected_key, 5.0f, blank, 2.0f);
 
 
 
-	}
-	else if (prev_state == STATE_PLAY) {
+	snprintf(text, sizeof(text), "EXIT");
+	DrawText(text, coord_keys[0] + 85.0f, coord_keys[1] + 35.0f, 0.6f, text_color,text_border_color,text_border_width);
+	snprintf(text, sizeof(text), "RESTART");
+	DrawText(text, coord_keys[0] + ( dim_frame[0]/3.0f+padding_keys/3.0f) + 55.0f, coord_keys[1] + 35.0f, 0.6f, text_color,text_border_color,text_border_width);
+	snprintf(text, sizeof(text), "DATA");
+	DrawText(text, coord_keys[0]+ dim_frame[0]*2.0f/3.0f+padding_keys*2.0f/3.0f + 75.0f, coord_keys[1] + 35.0f, 0.6f, text_color,text_border_color,text_border_width);
 
-		DrawRoundedRect(coord_keys[0],coord_keys[1], dim_frame[0]/2.0f-padding_keys, 50.0f, color_keys, 5.0f, black, 2.0f);
-		DrawRoundedRect(coord_keys[0]+ dim_frame[0]/2.0f+padding_keys,coord_keys[1], dim_frame[0]/2.0f-padding_keys, 50.0f, color_keys, 5.0f, black, 2.0f);
 
-		DrawRoundedRect(coord_keys[0] + ( dim_frame[0]/2.0f+padding_keys) * key_posX,coord_keys[1], dim_frame[0]/2.0f-padding_keys, 50.0f, color_selected_key, 5.0f, blank, 2.0f);
-		snprintf(text, sizeof(text), "EXIT");
-		DrawText(text, coord_keys[0] + 140.0f, coord_keys[1] + 35.0f, 0.6f, text_color,text_border_color,text_border_width);
-
-		snprintf(text, sizeof(text), "DATA");
-		DrawText(text, coord_keys[0]+ dim_frame[0]/2.0f+padding_keys + 133.0f, coord_keys[1] + 35.0f, 0.6f, text_color,text_border_color,text_border_width);
-	}
 }
 
 
@@ -507,58 +490,29 @@ void statistics_handle_events(GLFWwindow* window) {
 		pos_schede = 0.0f;
 		pos_schedeEndX = pos_schede;
 	}
-	else if (Input_KeyPressed(window, GLFW_KEY_RIGHT) || Input_KeyPressed(window, GLFW_KEY_D)) {
-		if(n_keys == 2 && select_key == 0) {
-			key_startX = (float)select_key;
-			select_key = 1;
-			key_endX = (float)select_key;
-			key_isMoving = 1;
-			key_moveElapsed = 0.0f;
-		}
-		else if (n_keys == 3 && select_key != 2) {
-			key_startX = (float)select_key;
-			select_key += 1;
-			key_endX = (float)select_key;
-			key_isMoving = 1;
-			key_moveElapsed = 0.0f;
-		}
+	else if ((Input_KeyPressed(window, GLFW_KEY_RIGHT) || Input_KeyPressed(window, GLFW_KEY_D)) && select_key != 2) {
+		key_startX = (float)select_key;
+		select_key += 1;
+		key_endX = (float)select_key;
+		key_isMoving = 1;
+		key_moveElapsed = 0.0f;
 	}
-	else if (Input_KeyPressed(window, GLFW_KEY_LEFT) || Input_KeyPressed(window, GLFW_KEY_A)) {
-		if (n_keys == 2 && select_key == 1) {
-			key_startX = (float)select_key;
-			select_key = 0;
-			key_endX = (float)select_key;
-			key_isMoving = 1;
-			key_moveElapsed = 0.0f;
-		}
-		else if (n_keys == 3 && select_key != 0) {
-			key_startX = (float)select_key;
-			select_key -= 1;
-			key_endX = (float)select_key;
-			key_isMoving = 1;
-			key_moveElapsed = 0.0f;
-		}
+	else if ((Input_KeyPressed(window, GLFW_KEY_LEFT) || Input_KeyPressed(window, GLFW_KEY_A)) && select_key != 0) {
+		key_startX = (float)select_key;
+		select_key -= 1;
+		key_endX = (float)select_key;
+		key_isMoving = 1;
+		key_moveElapsed = 0.0f;
 	}
 	else if (Input_KeyPressed(window, GLFW_KEY_ENTER) || Input_KeyPressed(window, GLFW_KEY_SPACE)) {
-		if (n_keys == 2) {
-			if (select_key == 0) {
-				GameState newstate = STATE_PLAY;
-				Game_SetState(newstate);
-			}
-			else if (select_key == 1) {
-
-			}
+		if (select_key == 0) {
+			GameState newstate = prev_state;
+			Game_SetState(newstate);
 		}
-		else if (n_keys == 3) {
-			if (select_key == 0) {
-				GameState newstate = prev_state;
-				Game_SetState(newstate);
-			}
-			else if (select_key == 1) {
-				GameState newstate = STATE_PLAY;
-				Game_Init();
-				Game_SetState(newstate);
-			}
+		else if (select_key == 1) {
+			GameState newstate = STATE_PLAY;
+			Game_Init();
+			Game_SetState(newstate);
 		}
 	}
 	else if (Input_KeyPressed(window, GLFW_KEY_R) && prev_state == STATE_GAMEOVER) {
@@ -566,21 +520,14 @@ void statistics_handle_events(GLFWwindow* window) {
 		Game_Init();
 		Game_SetState(newstate);
 	}
+	else if (Input_KeyPressed(window, GLFW_KEY_ESCAPE)) {
+		GameState newstate = STATE_OPTIONS;
+		Game_SetState(newstate);
+	}
 }
 
-void set_prev_state(int i) {
-	if (i==0) {
-		prev_state = STATE_PLAY;
-		n_keys = 2;
-	}
-	else if (i==1) {
-		prev_state = STATE_GAMEOVER;
-		n_keys = 3;
-	}
-	else if (i==2) {
-		prev_state = STATE_PAUSED;
-		n_keys = 3;
-	}
+void set_prev_state_statistics(GameState prev_state_give) {
+	prev_state = prev_state_give;
 }
 
 void statistics_esc(void) {

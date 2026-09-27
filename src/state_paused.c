@@ -97,7 +97,10 @@ void state_paused_handle_events(GLFWwindow* window) {
 	else if(Input_KeyPressed(window, GLFW_KEY_S)) {
 		GameState newstate = STATE_STATISTICS;
 		Game_SetState(newstate);
-		set_prev_state(2);
+	}
+	else if (Input_KeyPressed(window, GLFW_KEY_ESCAPE)) {
+		GameState newstate = STATE_OPTIONS;
+		Game_SetState(newstate);
 	}
 }
 
