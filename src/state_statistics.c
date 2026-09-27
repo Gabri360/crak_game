@@ -155,19 +155,21 @@ static void analisis(void) {
 	stdev_time = 0.0f;
 	mean_score = 0.0f;
 	stdev_score = 0.0f;
-	for(int i=0;i<(int)count_history_load;i++) {
-		mean_time += (float)history[i].game_time;
-		mean_score += (float)history[i].score;
-	}
-	mean_score /= (float)count_history_load;
-	mean_time /= (float)count_history_load;
+	if (count_history_load != 0) {
+		for(int i=0;i<(int)count_history_load;i++) {
+			mean_time += (float)history[i].game_time;
+			mean_score += (float)history[i].score;
+		}
+		mean_score /= (float)count_history_load;
+		mean_time /= (float)count_history_load;
 
-	for(int j=0;j<(int)count_history_load;j++) {
-		stdev_time += ((float)history[j].game_time - mean_time) * ((float)history[j].game_time - mean_time);
-		stdev_score += ((float)history[j].score - mean_time) * ((float)history[j].score - mean_time);
+		for(int j=0;j<(int)count_history_load;j++) {
+			stdev_time += ((float)history[j].game_time - mean_time) * ((float)history[j].game_time - mean_time);
+			stdev_score += ((float)history[j].score - mean_time) * ((float)history[j].score - mean_time);
+		}
+		stdev_score = sqrtf(stdev_score/(float)count_history_load);
+		stdev_time = sqrtf(stdev_time/(float)count_history_load);
 	}
-	stdev_score = sqrtf(stdev_score/(float)count_history_load);
-	stdev_time = sqrtf(stdev_time/(float)count_history_load);
 }
 
 static void draw_score_data(void) {
