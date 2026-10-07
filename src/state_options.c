@@ -19,6 +19,15 @@ static float border_width_frame;
 static float coord_frame[2];
 static float dim_frame[2];
 
+static vec4 null_color;
+static float paused_icon_dim;
+
+static vec4 shadow_color;
+static vec4 text_color;
+static vec4 text_border_color;
+static float text_border_width_title;
+static float shadow_offset;
+
 static void draw_frame(void) {
 
 	float revealW, revealH;
@@ -51,14 +60,36 @@ static void draw_frame(void) {
 
 }
 
+static void draw_paused_icon(void) {
+	float padding = 10.0f;
+	DrawRoundedRect(coord_frame[0] + dim_frame[0] - paused_icon_dim - padding + shadow_offset, coord_frame[1] + padding + shadow_offset, paused_icon_dim/4.0f,paused_icon_dim,shadow_color,10.0f, null_color, text_border_width_title);
+	DrawRoundedRect(coord_frame[0] + dim_frame[0] - paused_icon_dim - padding + paused_icon_dim/2.0f + shadow_offset, coord_frame[1] + padding + shadow_offset,paused_icon_dim/4.0f,paused_icon_dim,shadow_color,10.0f, null_color, text_border_width_title);
+
+	DrawRoundedRect(coord_frame[0] + dim_frame[0] - paused_icon_dim - padding, coord_frame[1] + padding, paused_icon_dim/4.0f ,paused_icon_dim,text_color, 10.0f, text_border_color, text_border_width_title);
+	DrawRoundedRect(coord_frame[0] + dim_frame[0] - paused_icon_dim - padding + paused_icon_dim/2.0f, coord_frame[1] + padding,paused_icon_dim/4.0f,paused_icon_dim,text_color, 10.0f, text_border_color, text_border_width_title);
+}
+
+static void draw_title(void) {
+	char text[32];
+	snprintf(text,sizeof(text), "SETTINGS");
+	DrawText(text, coord_frame[0] + dim_frame[0]/2.0f - 135.0f + shadow_offset, coord_frame[1] + 60.0f + shadow_offset,1.2f, shadow_color, null_color, text_border_width_title);
+	DrawText(text, coord_frame[0] + dim_frame[0]/2.0f - 135.0f, coord_frame[1] + 60.0f,1.2f, text_color, text_border_color, text_border_width_title);
+}
 
 void options_load(void) {
 	fill_color(color_frame_border, 255.0f, 146.0f, 0.0f, 1.0f);
 	fill_color(color_frame, 20.0f, 20.0f, 20.0f, 0.97f);
+	fill_color(null_color, 0.0f, 0.0f, 0.0f, 0.0f);
+	fill_color(text_color, 255.0f, 146.0f, 0.0f, 1.0f);
+	fill_color(text_border_color, 0.1f, 0.1f, 0.1f, 1.0f);
+	fill_color(shadow_color, 255.0f, 255.0f, 255.0f, 0.5f);
 
+	text_border_width_title = 3.0f;
+	shadow_offset = 5.0f;
 
 	border_radius_frame = 10.0f;
 	border_width_frame = 3.0f;
+	paused_icon_dim = 60.0f;
 
 	frame_anim_time = 0.0f;
 
@@ -87,6 +118,8 @@ void state_options_run(void) {
 
 	draw_prev_state();
 	draw_frame();
+	draw_paused_icon();
+	draw_title();
 
     glDisable(GL_SCISSOR_TEST);
 }

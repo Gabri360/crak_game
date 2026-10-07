@@ -372,6 +372,7 @@ void state_play_init(void) {
 	PendX = 0.0f;
 	PposX = 0.0f;
 	isAlive = 1;
+	isPlay = 1;
 
 	update_background_colors();
 
