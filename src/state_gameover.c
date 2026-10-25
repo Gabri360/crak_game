@@ -77,7 +77,7 @@ static void draw_leaderboard(void) {
     glEnable(GL_SCISSOR_TEST);
     glScissor((int)revealX, (int)((float)WIN_H - (revealY + revealH)), (int)revealW, (int)revealH);
 	//DrawRoundedRect((coord_lb[0]),(coord_lb[1]),dim_lb[0],dim_lb[1],color_leaderboard,border_radius_lb,color_leaderboard_border, border_width_lb);
-	DrawRoundedRect(revealX,(int)((float)WIN_H - (revealY + revealH)),revealW,revealH,color_leaderboard,border_radius_lb,color_leaderboard_border, border_width_lb);
+	DrawRoundedRect(revealX,((float)WIN_H - (revealY + revealH)),revealW,revealH,color_leaderboard,border_radius_lb,color_leaderboard_border, border_width_lb);
 
 	if(game_time>LB_ANIM_PHASE1_DURATION) {
 		char text[32];
@@ -226,12 +226,12 @@ void state_gameover_handle_events(GLFWwindow* window) {
         glfwSetWindowShouldClose(window, 1);
 	}
 	else if (Input_KeyPressed(window, GLFW_KEY_ENTER) || Input_KeyPressed(window, GLFW_KEY_SPACE)) {
-		GameState newstate;
+		GameState newstate = STATE_PLAY;
 		if (select_key == 0) {
 			newstate = STATE_PLAY;
 			Game_Init();
 		}
-		else if (select_key ==1) {
+		else if (select_key == 1) {
 			newstate = STATE_STATISTICS;
 		}
 		Game_SetState(newstate);
