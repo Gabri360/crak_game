@@ -112,7 +112,7 @@ static void draw_frame(void) {
     glEnable(GL_SCISSOR_TEST);
     glScissor((int)revealX, (int)((float)WIN_H - (revealY + revealH)), (int)revealW, (int)revealH);
 
-	DrawRoundedRect(revealX,(int)((float)WIN_H - (revealY + revealH)),revealW,revealH,color_frame,border_radius_frame,color_frame_border, border_width_frame);
+	DrawRoundedRect(revealX,((float)WIN_H - (revealY + revealH)),revealW,revealH,color_frame,border_radius_frame,color_frame_border, border_width_frame);
 
 }
 
